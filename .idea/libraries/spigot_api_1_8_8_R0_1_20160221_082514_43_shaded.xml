@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="spigot-api-1.8.8-R0.1-20160221.082514-43-shaded">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../minecraft/DEP/1.8.8-spigot-api/spigot-api-1.8.8-R0.1-20160221.082514-43-shaded.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

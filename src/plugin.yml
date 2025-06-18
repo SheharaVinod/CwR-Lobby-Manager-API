@@ -1,0 +1,30 @@
+name: CwRLobbyManagerAPI
+main: lk.cwresports.LobbyManager.CwRLobbyAPI
+version: 1.0.0
+author: Mr_Unknown
+website: cwresports.lk
+description: Lobby manager api for manage CwR hubs and mini-game lobbies.
+
+commands:
+  lobby-manager:
+    description: Main command for setup lobbies and others.
+    permission-message: You don't have permission to execute this command.
+    permission: cwr-core.lobby-manager.main
+    usage: /lobby-manager help
+
+permissions:
+  cwr-core.lobby-manager.admin:
+    default: op
+    description: all admin related commands.
+
+  cwr-core.lobby-manager.main:
+    default: op
+    description: normal commands.
+
+  cwr-core.lobby-manager.lobbies.default:
+    default: true
+    description: default lobby.
+
+  cwr-core.lobby-manager.lobbies.special:
+    default: false
+    description: special lobby.
