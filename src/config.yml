@@ -1,0 +1,19 @@
+# lobby manager
+
+lobbies: null
+
+#lobbies:
+#  hub:
+#    group: default
+#    next-location-type: default
+#    default-spawn-locations: 0,100,0
+#    spawn-locations:
+#      - 100,100,100
+#      - 200,100,300
+#  special:
+#    group: special
+#    next-location-type: random
+#    default-spawn-locations: 0,100,0
+#    spawn-locations:
+#      - 100,100,100
+#      - 200,100,300

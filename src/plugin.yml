@@ -25,6 +25,6 @@ permissions:
     default: true
     description: default lobby.
 
-  cwr-core.lobby-manager.lobbies.special:
+  cwr-core.lobby-manager.lobbies.others:
     default: false
     description: special lobby.

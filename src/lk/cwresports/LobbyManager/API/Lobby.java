@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 public class Lobby {
     private final World world;
@@ -17,8 +18,8 @@ public class Lobby {
     private NextLocationTypes locationTypes = NextLocationTypes.DEFAULT;
     private final Random random = new Random();
 
-    public Lobby(World world, Location currentLocation) {
-        this.world = world;
+    public Lobby(Location currentLocation) {
+        this.world = currentLocation.getWorld();
         this.defaultSpawnLocation = currentLocation;
         spawn_locations.add(currentLocation);
         this.nextLocation = currentLocation;
@@ -65,5 +66,21 @@ public class Lobby {
             }
         }
         return nextLocation;
+    }
+
+    public Location getDefaultSpawnLocation() {
+        return defaultSpawnLocation;
+    }
+
+    public List<Location> getSpawnLocations() {
+        return spawn_locations;
+    }
+
+    public NextLocationTypes getLocationTypes() {
+        return locationTypes;
+    }
+
+    public UUID getWorldUID() {
+        return world.getUID();
     }
 }
