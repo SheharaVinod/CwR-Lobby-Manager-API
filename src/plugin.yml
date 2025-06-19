@@ -1,30 +1,79 @@
-name: CwRLobbyManagerAPI
+name: CwR-Lobby-Manager
 main: lk.cwresports.LobbyManager.CwRLobbyAPI
 version: 1.0.0
-author: Mr_Unknown
+author: CwR Sports
 website: cwresports.lk
-description: Lobby manager api for manage CwR hubs and mini-game lobbies.
+api-version: 1.8
+description: Advanced Lobby Management System with permission-based routing and load balancing
 
 commands:
-  lobby-manager:
-    description: Main command for setup lobbies and others.
+  lobbymanager:
+    description: Main admin command for lobby management
+    aliases: [lm]
+    permission: cwr-core.lobby-manager.admin
     permission-message: You don't have permission to execute this command.
-    permission: cwr-core.lobby-manager.main
-    usage: /lobby-manager help
+    usage: /<command> <subcommand> [args]
+  
+  spawn:
+    description: Teleport to appropriate lobby
+    permission: cwr-core.lobby-manager.command.spawn
+    permission-message: You don't have permission to use this command.
+    usage: /<command>
+  
+  lobby:
+    description: Lobby selection and management commands
+    permission-message: You don't have permission to use this command.
+    usage: /<command> <subcommand> [args]
 
 permissions:
   cwr-core.lobby-manager.admin:
+    description: Access to all admin commands
     default: op
-    description: all admin related commands.
-
-  cwr-core.lobby-manager.main:
+    children:
+      cwr-core.lobby-manager.admin.creategroup: true
+      cwr-core.lobby-manager.admin.deletegroup: true
+      cwr-core.lobby-manager.admin.addlobby: true
+      cwr-core.lobby-manager.admin.removelobby: true
+      cwr-core.lobby-manager.admin.assigngroup: true
+      cwr-core.lobby-manager.admin.groups: true
+      cwr-core.lobby-manager.admin.reload: true
+  
+  cwr-core.lobby-manager.admin.creategroup:
+    description: Create new lobby groups
     default: op
-    description: normal commands.
-
-  cwr-core.lobby-manager.lobbies.default:
-    default: true
-    description: default lobby.
-
+  
+  cwr-core.lobby-manager.admin.deletegroup:
+    description: Delete lobby groups
+    default: op
+  
+  cwr-core.lobby-manager.admin.addlobby:
+    description: Add new lobbies
+    default: op
+  
+  cwr-core.lobby-manager.admin.removelobby:
+    description: Remove lobbies
+    default: op
+  
+  cwr-core.lobby-manager.admin.assigngroup:
+    description: Assign lobbies to groups
+    default: op
+  
+  cwr-core.lobby-manager.admin.groups:
+    description: List all groups
+    default: op
+  
+  cwr-core.lobby-manager.admin.reload:
+    description: Reload plugin configuration
+    default: op
+  
   cwr-core.lobby-manager.lobbies.others:
+    description: Access to select different lobby groups
     default: false
-    description: special lobby.
+  
+  cwr-core.lobby-manager.command.spawn:
+    description: Use spawn command
+    default: true
+  
+  cwr-core.lobby-manager.command.teleport:
+    description: Direct teleport to specific lobby
+    default: false
