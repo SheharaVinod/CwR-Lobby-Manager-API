@@ -2,24 +2,38 @@ package lk.cwresports.LobbyManager.API;
 
 import lk.cwresports.LobbyManager.CwRLobbyAPI;
 import lk.cwresports.LobbyManager.Utils.PermissionNodes;
-import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class LobbyManager {
     private static LobbyManager manager;
     Map<String, LobbyGroup> lobbyGroupMap = new HashMap<>();
     private Lobby defaultSelectedLobby;
-    private Lobby specialSelectedLobby;
     private final CwRLobbyAPI plugin;
+    private static final Set<Player> spawnBlockedPlayers = new HashSet<>();
 
     public LobbyManager() {
         plugin = CwRLobbyAPI.getPlugin();
+
+        // creating instance.
+        getDefaultGroup();
+
+    }
+
+    public static void blockSpawnCommand(Player player) {
+        spawnBlockedPlayers.add(player);
+    }
+
+    public static void unBlockSpawnCommand(Player player) {
+        spawnBlockedPlayers.remove(player);
+    }
+
+    public static boolean isBlockedSpawnCommand(Player player) {
+        return spawnBlockedPlayers.contains(player);
     }
 
     public void sendToLobby(Player player) {
@@ -36,8 +50,7 @@ public class LobbyManager {
 
     private Lobby getSelectedLobbyOf(Player player) {
         LobbyGroup group = getLobbyGroupOf(player);
-
-        return
+        return group.getCurrentLobby();
     }
 
     public boolean playerIsMoreThanDefault(Player player) {
@@ -53,37 +66,21 @@ public class LobbyManager {
 
 
     private LobbyGroup getLobbyGroupOf(Player player) {
-        if (player.hasPermission("cwr-core.lobby-manager.special")) {
-            return LobbyGroups.SPECIAL;
-        } else {
-            return LobbyGroups.DEFAULT;
+        if (playerIsMoreThanDefault(player)) {
+            // TODO: read config and get what category he selected.
+
+            return null;
         }
+        return getDefaultGroup();
     }
 
-    public void saveLobbyToConfig(Lobby lobby, LobbyGroups group) {
-        FileConfiguration config = plugin.getConfig();
-        String basePath = "lobbies." + lobby.getWorldUID().toString();
 
-        config.set(basePath + ".group", lobby.get.name());
-        config.set(basePath + ".next-location-type", lobby.getLocationTypes().name());
-        config.set(basePath + ".world", lobby.getWorld().getName());
-        config.set(basePath + ".default-spawn-location", locationToString(lobby.getDefaultSpawnLocation()));
-
-        List<String> spawnLocations = new ArrayList<>();
-        for (Location loc : lobby.getSpawnLocations()) {
-            spawnLocations.add(locationToString(loc));
+    final String defaultKey = "default";
+    public LobbyGroup getDefaultGroup() {
+        if (!this.lobbyGroupMap.containsKey(defaultKey)) {
+            LobbyGroup default_group = new LobbyGroup(defaultKey);
+            this.lobbyGroupMap.put(default_group.getName(), default_group);
         }
-        config.set(basePath + ".spawn-locations", spawnLocations);
-
-        plugin.saveConfig();
-    }
-
-    private String locationToString(Location location) {
-        return String.format("%.2f,%.2f,%.2f,%.2f,%.2f",
-                location.getX(),
-                location.getY(),
-                location.getZ(),
-                location.getYaw(),
-                location.getPitch());
+        return this.lobbyGroupMap.get(defaultKey);
     }
 }

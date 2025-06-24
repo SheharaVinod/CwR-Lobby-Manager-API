@@ -23,6 +23,9 @@ public class Lobby {
         this.defaultSpawnLocation = currentLocation;
         spawn_locations.add(currentLocation);
         this.nextLocation = currentLocation;
+
+        // add to default group threw Manager
+        LobbyManager.getInstance().getDefaultGroup().addLobby(this);
     }
 
     public void setLocationTypes(NextLocationTypes locationTypes) {

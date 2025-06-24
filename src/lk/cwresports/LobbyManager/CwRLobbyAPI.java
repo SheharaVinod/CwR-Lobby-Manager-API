@@ -1,9 +1,17 @@
 package lk.cwresports.LobbyManager;
 
+import lk.cwresports.LobbyManager.API.LobbyManager;
+import lk.cwresports.LobbyManager.Commands.SpawnCommand;
+import lk.cwresports.LobbyManager.ConfigAndData.PlayerDataManager;
+import lk.cwresports.LobbyManager.Events.PlayerJoinToServer;
+import lk.cwresports.LobbyManager.Events.PlayerLeaveListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CwRLobbyAPI extends JavaPlugin {
+    public static final String PREFIX = "&7[&6CwRLobbyAPI&7]&r ";
+
     private static CwRLobbyAPI plugin;
+    private PlayerDataManager playerData;
 
     @Override
     public void onLoad() {
@@ -12,8 +20,21 @@ public class CwRLobbyAPI extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
+        playerData = new PlayerDataManager(this);
 
 
+        // load lobby manager;
+        LobbyManager.getInstance();
+
+
+        // commands
+        getCommand(SpawnCommand.NAME).setExecutor(new SpawnCommand());
+
+
+        // events
+        PlayerJoinToServer.register(this);
+        PlayerLeaveListener.register(this);
     }
 
 
@@ -21,6 +42,7 @@ public class CwRLobbyAPI extends JavaPlugin {
         return plugin;
     }
 
-
-
+    public PlayerDataManager getPlayerDataManager() {
+        return this.playerData;
+    }
 }

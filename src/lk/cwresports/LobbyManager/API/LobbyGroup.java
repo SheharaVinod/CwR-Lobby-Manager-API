@@ -11,15 +11,23 @@ public class LobbyGroup {
     public LobbyGroup(String name) {
         this.name = name;
 
+        LobbyManager.getInstance().registerLobbyGroup(this);
+    }
 
+    public void saveToConfig() {
+        // TODO: save this in config file.
     }
 
     public Lobby getCurrentLobby() {
+        if (currentLobby == null) {
+            // TODO:
+        }
         return currentLobby;
     }
 
-    public void changeLobby() {
+    public void changeCurrentLobby() {
         // lobby change functianalities.
+
     }
 
     public List<Lobby> getLobbies() {
@@ -32,7 +40,6 @@ public class LobbyGroup {
 
     public void addLobby(Lobby lobby) {
         this.lobbies.add(lobby);
-        // TODO: save in config.
     }
 
     public void removeLobby(Lobby lobby) {

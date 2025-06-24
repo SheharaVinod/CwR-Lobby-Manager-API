@@ -1,6 +1,6 @@
 # lobby manager
-
-lobbies: null
+# you can set this to true after you config the server; if you want.
+hide-lobby-manager-command: false
 
 #lobbies:
 #  hub:
