@@ -10,7 +10,14 @@ public class TextStrings {
     public static String YOU_ARE_NOT_IN_ADMIN_MOD = "&4You are not in admin mod to use this command.!";
 
     public static String YOU_DONT_HAVE_PERMISSION = "&4You don't have permission.!";
-
+				
+    public static String[] HELP = 	{
+        "You can create lobby group using",
+        "/lobby-manager create_group <name>",
+        "You can setup lobby using.",
+        "/lobby-manager create_lobby <name>"
+    };
+				
     public static String colorize(String massage) {
         return colorize(massage, true);
     }
