@@ -26,6 +26,7 @@ public class CwRLobbyAPI extends JavaPlugin {
 
         // load lobby manager;
         LobbyManager.getInstance();
+        LobbyManager.getInstance().load();
 
 
         // commands

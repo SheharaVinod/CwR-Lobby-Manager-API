@@ -2,12 +2,10 @@ package lk.cwresports.LobbyManager.API;
 
 import lk.cwresports.LobbyManager.CwRLobbyAPI;
 import lk.cwresports.LobbyManager.Utils.PermissionNodes;
+import lk.cwresports.LobbyManager.Utils.TextStrings;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class LobbyManager {
     private static LobbyManager manager;
@@ -21,7 +19,36 @@ public class LobbyManager {
 
         // creating instance.
         getDefaultGroup();
+    }
 
+    public Lobby getLobbyByName(String name) {
+        // can be null.
+        for (LobbyGroup lobbyGroup : lobbyGroupMap.values()) {
+            for (Lobby lobby : lobbyGroup.getLobbies()) {
+                if (lobby.getWorld().getName().equalsIgnoreCase(name)) {
+                    return lobby;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<String> getLobbies() {
+        List<String> nameList = new ArrayList<>();
+        for (LobbyGroup lobbyGroup : lobbyGroupMap.values()) {
+            for (Lobby lobby : lobbyGroup.getLobbies()) {
+                nameList.add(lobby.getWorld().getName());
+            }
+        }
+        return nameList;
+    }
+
+    public List<String> getGroups() {
+        List<String> nameList = new ArrayList<>();
+        for (LobbyGroup lobbyGroup : lobbyGroupMap.values()) {
+            nameList.add(lobbyGroup.getName());
+        }
+        return nameList;
     }
 
     public static void blockSpawnCommand(Player player) {
@@ -34,6 +61,20 @@ public class LobbyManager {
 
     public static boolean isBlockedSpawnCommand(Player player) {
         return spawnBlockedPlayers.contains(player);
+    }
+
+    public void change_group_of(String lobby, String group, Player admin) {
+        Lobby lobby_ = getLobbyByName(lobby);
+        LobbyGroup lobbyGroup_ = lobbyGroupMap.get(group);
+
+        if (lobby_ == null || lobbyGroup_ == null) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return;
+        }
+
+        getDefaultGroup().removeLobby(lobby_);
+        lobbyGroup_.addLobby(lobby_);
+        admin.sendMessage(TextStrings.colorize(TextStrings.CHANGE_GROUP_SUCCESSFULLY));
     }
 
     public void sendToLobby(Player player) {
@@ -69,11 +110,20 @@ public class LobbyManager {
         if (playerIsMoreThanDefault(player)) {
             // TODO: read config and get what category he selected.
 
-            return null;
+            return getDefaultGroup();
         }
         return getDefaultGroup();
     }
 
+    public void save() {
+        // TODO: save lobbies and groups.
+
+    }
+
+    public void load() {
+        // TODO: load existing data from config and other data files.
+
+    }
 
     final String defaultKey = "default";
     public LobbyGroup getDefaultGroup() {

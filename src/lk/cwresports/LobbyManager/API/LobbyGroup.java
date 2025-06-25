@@ -26,7 +26,7 @@ public class LobbyGroup {
     }
 
     public void changeCurrentLobby() {
-        // lobby change functianalities.
+        // lobby change functionalities.
 
     }
 
