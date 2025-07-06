@@ -50,4 +50,7 @@ public class LobbyGroup {
         return this.lobbies.contains(lobby);
     }
 
+    public void setCurrentLobby(Lobby currentLobby) {
+
+    }
 }

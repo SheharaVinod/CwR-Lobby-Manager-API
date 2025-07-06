@@ -1,5 +1,6 @@
 package lk.cwresports.LobbyManager.API;
 
+import lk.cwresports.LobbyManager.ConfigAndData.LobbyDataManager;
 import lk.cwresports.LobbyManager.CwRLobbyAPI;
 import lk.cwresports.LobbyManager.Utils.PermissionNodes;
 import lk.cwresports.LobbyManager.Utils.TextStrings;
@@ -9,10 +10,10 @@ import java.util.*;
 
 public class LobbyManager {
     private static LobbyManager manager;
-    Map<String, LobbyGroup> lobbyGroupMap = new HashMap<>();
+    public Map<String, LobbyGroup> lobbyGroupMap = new HashMap<>();
     Map<String, Lobby> lobbyNameMap = new HashMap<>();
 
-    private Lobby defaultSelectedLobby;
+    public Lobby defaultSelectedLobby;
     private final CwRLobbyAPI plugin;
     private static final Set<Player> spawnBlockedPlayers = new HashSet<>();
     private static final List<EventLobbies> eventLobbies = new ArrayList<>();
@@ -161,12 +162,12 @@ public class LobbyManager {
 
     public void save() {
         // TODO: save lobbies and groups.
-
+        new LobbyDataManager(plugin).saveData();
     }
 
     public void load() {
         // TODO: load existing data from config and other data files.
-
+        new LobbyDataManager(plugin).loadData();
     }
 
     final String defaultKey = "default";
