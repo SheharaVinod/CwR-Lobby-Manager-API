@@ -11,6 +11,8 @@ public class TextStrings {
     public static String YOU_CANT_CREATE_BLANK_GROUP = "&4You are not able to create a anonymous group.!";
     public static String GROUP_CREATED_SUCCESSFULLY = "&6Group created successfully.";
     public static String LOBBY_CREATED_SUCCESSFULLY = "&6Lobby created successfully.";
+    public static String ALREADY_A_LOBBY = "&6This is already a lobby.";
+    public static String EVENT_LOBBY_CREATED_SUCCESSFULLY = "&6Event lobby created successfully.";
     public static String SOMETHING_WENT_WRONG = "&6Something went wrong. check again.";
     public static String CHANGE_GROUP_SUCCESSFULLY = "&6Something went wrong. check again.";
     public static String SUCCESSFUL = "&6Success.!";
@@ -25,11 +27,18 @@ public class TextStrings {
 				
     public static String[] HELP = 	{
             "&bYou can create lobby group using",
+            "",
             "&6/lobby-manager create_group <name>",
-            "&bYou can setup lobby using.",
-            "&6/lobby-manager create_lobby <name>",
-            "&bYou can change group of a lobby using.",
-            "&6/lobby-manager change_group_of <lobby_name> <group_name>"
+            "&6/lobby-manager delete_group name",
+            "&6/lobby-manager create_lobby",
+            "&6/lobby-manager delete_lobby",
+            "&6/lobby-manager save",
+            "&6/lobby-manager create_event_lobby",
+            "&6/lobby-manager set_period <MM-DD-HH-mm-ss> <days> <timezone>",
+            "&6/lobby-manager change_lobby_spawn_rotation default",
+            "&6/lobby-manager change_group_of <lobby_name> <group_name>",
+            "&6/lobby-manager change_group_of <lobby_name> <group_name>",
+            ""
     };
 				
     public static String colorize(String massage) {

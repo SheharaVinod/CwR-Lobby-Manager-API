@@ -24,8 +24,7 @@ public class Lobby {
         spawn_locations.add(currentLocation);
         this.nextLocation = currentLocation;
 
-        // add to default group threw Manager
-        LobbyManager.getInstance().getDefaultGroup().addLobby(this);
+        LobbyManager.getInstance().registerNameFor(this);
     }
 
     public void setLocationTypes(NextLocationTypes locationTypes) {
@@ -44,6 +43,10 @@ public class Lobby {
 
     public void removeSpawnLocation(int index) {
         spawn_locations.remove(index);
+    }
+
+    public boolean isEventLobby() {
+        return false;
     }
 
     public void send(Player player) {

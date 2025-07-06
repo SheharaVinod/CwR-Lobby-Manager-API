@@ -10,9 +10,13 @@ import java.util.*;
 public class LobbyManager {
     private static LobbyManager manager;
     Map<String, LobbyGroup> lobbyGroupMap = new HashMap<>();
+    Map<String, Lobby> lobbyNameMap = new HashMap<>();
+
     private Lobby defaultSelectedLobby;
     private final CwRLobbyAPI plugin;
     private static final Set<Player> spawnBlockedPlayers = new HashSet<>();
+    private static final List<EventLobbies> eventLobbies = new ArrayList<>();
+
 
     public LobbyManager() {
         plugin = CwRLobbyAPI.getPlugin();
@@ -21,19 +25,21 @@ public class LobbyManager {
         getDefaultGroup();
     }
 
-    public Lobby getLobbyByName(String name) {
-        // can be null.
-        for (LobbyGroup lobbyGroup : lobbyGroupMap.values()) {
-            for (Lobby lobby : lobbyGroup.getLobbies()) {
-                if (lobby.getWorld().getName().equalsIgnoreCase(name)) {
-                    return lobby;
-                }
-            }
-        }
-        return null;
+    public void registerNameFor(Lobby lobby) {
+        String name = lobby.getWorld().getName();
+        lobbyNameMap.put(name, lobby);
     }
 
-    public List<String> getLobbies() {
+    public Lobby getLobbyByName(String name) {
+        // can be null.
+        return lobbyNameMap.get(name);
+    }
+
+    public List<EventLobbies> getEventLobbies() {
+        return eventLobbies;
+    }
+
+    public List<String> getGroupedLobbies() {
         List<String> nameList = new ArrayList<>();
         for (LobbyGroup lobbyGroup : lobbyGroupMap.values()) {
             for (Lobby lobby : lobbyGroup.getLobbies()) {
@@ -41,6 +47,10 @@ public class LobbyManager {
             }
         }
         return nameList;
+    }
+
+    public List<String> getAllLobbies() {
+        return new ArrayList<>(lobbyNameMap.keySet());
     }
 
     public List<String> getGroups() {
@@ -63,26 +73,60 @@ public class LobbyManager {
         return spawnBlockedPlayers.contains(player);
     }
 
-    public void change_group_of(String lobby, String group, Player admin) {
-        Lobby lobby_ = getLobbyByName(lobby);
-        LobbyGroup lobbyGroup_ = lobbyGroupMap.get(group);
+    public void change_group_of(String lobby_name, String group, Player admin) {
+        Lobby lobby = getLobbyByName(lobby_name);
+        LobbyGroup previous_group = getCurrentGroupOf(lobby);
+        LobbyGroup new_group = lobbyGroupMap.get(group);
 
-        if (lobby_ == null || lobbyGroup_ == null) {
+        if (lobby == null || new_group == null || lobby instanceof EventLobbies || previous_group == null) {
             admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
             return;
         }
+        previous_group.removeLobby(lobby);
+        new_group.addLobby(lobby);
 
-        getDefaultGroup().removeLobby(lobby_);
-        lobbyGroup_.addLobby(lobby_);
+        admin.sendMessage(TextStrings.colorize("Lobby name: " + lobby_name));
+        admin.sendMessage(TextStrings.colorize("Previous group: " + previous_group.getName()));
+        admin.sendMessage(TextStrings.colorize("New group: " + new_group.getName()));
         admin.sendMessage(TextStrings.colorize(TextStrings.CHANGE_GROUP_SUCCESSFULLY));
     }
 
     public void sendToLobby(Player player) {
+        if (EventManager.getInstance().isInEvent()) {
+            EventManager.getInstance().getEventLobby().send(player);
+            return;
+        }
+
         getSelectedLobbyOf(player).send(player);
+    }
+
+    public LobbyGroup getCurrentGroupOf(Lobby lobby) {
+        if (lobby == null) return null;
+
+        for (LobbyGroup lobbyGroup : lobbyGroupMap.values()) {
+            if (lobbyGroup.getLobbies().contains(lobby)) {
+                return lobbyGroup;
+            }
+        }
+        return null;
     }
 
     public LobbyGroup getLobbyGroup(String name) {
         return this.lobbyGroupMap.get(name);
+    }
+
+    public boolean unregisterLobbyGroup(String name) {
+        LobbyGroup group = this.lobbyGroupMap.get(name);
+        if (group == null) return false;
+        for (Lobby lobby : group.getLobbies()) {
+            deleteLobby(lobby.getWorld().getName());
+        }
+        this.lobbyGroupMap.remove(name);
+        return true;
+    }
+
+    public void deleteLobby(String name) {
+        lobbyNameMap.remove(name);
     }
 
     public void registerLobbyGroup(LobbyGroup lobbyGroup) {
@@ -108,7 +152,7 @@ public class LobbyManager {
 
     private LobbyGroup getLobbyGroupOf(Player player) {
         if (playerIsMoreThanDefault(player)) {
-            // TODO: read config and get what category he selected.
+            // TODO: read player data and get what category he selected.
 
             return getDefaultGroup();
         }

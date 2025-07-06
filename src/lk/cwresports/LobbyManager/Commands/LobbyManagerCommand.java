@@ -1,9 +1,6 @@
 package lk.cwresports.LobbyManager.Commands;
 
-import lk.cwresports.LobbyManager.API.Lobby;
-import lk.cwresports.LobbyManager.API.LobbyGroup;
-import lk.cwresports.LobbyManager.API.LobbyManager;
-import lk.cwresports.LobbyManager.API.NextLocationTypes;
+import lk.cwresports.LobbyManager.API.*;
 import lk.cwresports.LobbyManager.Utils.PermissionNodes;
 import lk.cwresports.LobbyManager.Utils.TextStrings;
 import org.bukkit.command.Command;
@@ -18,13 +15,30 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String NAME = "lobby-manager";
 
     public static final String sub_create_group = "create_group";
+    public static final String sub_delete_group = "delete_group";
     public static final String sub_create_lobby = "create_lobby";
+    public static final String sub_delete_lobby = "delete_lobby";
     public static final String sub_change_lobby_spawn_rotation = "change_lobby_spawn_rotation";
     public static final String sub_change_group_of = "change_group_of";
     public static final String sub_admin = "admin";
+    public static final String sub_set_period = "set_period";
     public static final String sub_help = "help";
     public static final String sub_info = "info";
     public static final String sub_save = "save";
+
+    public static final String[] subs = {
+            sub_create_group,
+            sub_delete_group,
+            sub_create_lobby,
+            sub_delete_lobby,
+            sub_change_lobby_spawn_rotation,
+            sub_change_group_of,
+            sub_admin,
+            sub_set_period,
+            sub_help,
+            sub_info,
+            sub_save
+    };
 
     private static final Set<Player> admins = new HashSet<>();
 
@@ -46,6 +60,7 @@ public class LobbyManagerCommand implements CommandExecutor {
             admin.sendMessage(TextStrings.colorize(TextStrings.YOU_DONT_HAVE_PERMISSION));
             return true;
         }
+
         // TODO: toggle admin here.
         if (!(strings.length > 0)) {
             return help(admin, strings);
@@ -74,8 +89,42 @@ public class LobbyManagerCommand implements CommandExecutor {
             } else if (strings[0].equalsIgnoreCase(sub_change_lobby_spawn_rotation)) {
                 return change_lobby_spawn_rotation(admin, strings);
             }
+            else if (strings[0].equalsIgnoreCase(sub_set_period)) {
+                return set_period(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_delete_group)) {
+                return delete_group(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_delete_lobby)) {
+                return delete_lobby(admin, strings);
+            }
         }
 
+        return true;
+    }
+
+    public boolean set_period(Player admin, String[] strings) {
+        if (strings.length < 4) {
+            admin.sendMessage("§cUsage: /lobby-manager set_period <MM-DD-HH-mm-ss> <days> <timezone>");
+            return true;
+        }
+
+        try {
+            String date = strings[1];
+            int expireDays = Integer.parseInt(strings[2].replace("d", ""));
+            String timezone = strings[3];
+
+            // Validate lobby type
+            //? wrong...
+            Lobby lobby = LobbyManager.getInstance().getLobbyByName(admin.getWorld().getName());
+            if (!(lobby instanceof EventLobbies)) {
+                admin.sendMessage("§cYou must be in an event lobby!");
+                return true;
+            }
+
+            ((EventLobbies) lobby).setPeriod(date, expireDays, timezone);
+            admin.sendMessage("§aEvent period set successfully!");
+        } catch (Exception e) {
+            admin.sendMessage("§cInvalid arguments! Format: MM-DD-HH-mm-ss days timezone");
+        }
         return true;
     }
 
@@ -87,6 +136,26 @@ public class LobbyManagerCommand implements CommandExecutor {
             admins.add(admin);
             admin.sendMessage(TextStrings.colorize(TextStrings.YOU_ARE_NOW_IN_ADMIN_MOD));
         }
+        return true;
+    }
+
+    public boolean delete_lobby(Player admin, String[] strings) {
+        //lobby-manager delete_lobby
+        String name = admin.getWorld().getName();
+        Lobby lobby = LobbyManager.getInstance().getLobbyByName(name);
+        if (lobby == null) {
+            admin.sendMessage(TextStrings.colorize("This world is not a lobby to delete"));
+            return true;
+        }
+        LobbyManager.getInstance().deleteLobby(name);
+        return true;
+    }
+
+    public boolean delete_group(Player admin, String[] strings) {
+        //lobby-manager delete_group name
+        if (strings.length < 2) return false;
+        boolean isDeleted = LobbyManager.getInstance().unregisterLobbyGroup(strings[1]);
+        admin.sendMessage(TextStrings.colorize("is group deleted : " + isDeleted));
         return true;
     }
 
@@ -108,10 +177,35 @@ public class LobbyManagerCommand implements CommandExecutor {
     }
 
     public boolean create_lobby(Player admin, String[] strings) {
-        Lobby lobby = new Lobby(admin.getLocation());
+        if (alreadyLobby(admin)) {
+            return true;
+        }
+
+        Lobby lobby = new GroupLobbies(admin.getLocation());
         admin.sendMessage(TextStrings.colorize(TextStrings.LOBBY_CREATED_SUCCESSFULLY));
         // TODO: check
         //? NOTE: by default lobby add to default group.
+        return true;
+    }
+
+    private boolean alreadyLobby(Player admin) {
+        String name = admin.getWorld().getName();
+        Lobby existingLobby = LobbyManager.getInstance().getLobbyByName(name);
+        if (existingLobby != null) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.ALREADY_A_LOBBY));
+            return true;
+        }
+        return false;
+    }
+
+    public boolean create_event_lobby(Player admin, String[] strings) {
+        if (alreadyLobby(admin)) {
+            return true;
+        }
+
+        Lobby lobby = new EventLobbies(admin.getLocation());
+        admin.sendMessage(TextStrings.colorize(TextStrings.EVENT_LOBBY_CREATED_SUCCESSFULLY));
+        // TODO: check
         return true;
     }
 
@@ -167,4 +261,8 @@ public class LobbyManagerCommand implements CommandExecutor {
         }
         return true;
     }
+
+
+
+
 }
