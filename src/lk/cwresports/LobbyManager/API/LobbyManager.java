@@ -94,11 +94,15 @@ public class LobbyManager {
 
     public void sendToLobby(Player player) {
         if (EventManager.getInstance().isInEvent()) {
-            EventManager.getInstance().getEventLobby().send(player);
+            EventLobbies eventLobby = EventManager.getInstance().getEventLobby();
+            if (eventLobby == null) return;
+            eventLobby.send(player);
             return;
         }
 
-        getSelectedLobbyOf(player).send(player);
+        Lobby selectedLobbyOf = getSelectedLobbyOf(player);
+        if (selectedLobbyOf == null) return;
+        selectedLobbyOf.send(player);
     }
 
     public LobbyGroup getCurrentGroupOf(Lobby lobby) {
@@ -161,12 +165,10 @@ public class LobbyManager {
     }
 
     public void save() {
-        // TODO: save lobbies and groups.
         new LobbyDataManager(plugin).saveData();
     }
 
     public void load() {
-        // TODO: load existing data from config and other data files.
         new LobbyDataManager(plugin).loadData();
     }
 

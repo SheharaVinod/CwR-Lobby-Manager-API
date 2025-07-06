@@ -47,7 +47,7 @@ public class TextStrings {
 
     public static String colorize(String massage, boolean prefix) {
         if (prefix) {
-            return colorize(CwRLobbyAPI.PREFIX) + colorize(massage);
+            return ChatColor.translateAlternateColorCodes('&', CwRLobbyAPI.PREFIX) + ChatColor.translateAlternateColorCodes('&', massage);
         }
         return ChatColor.translateAlternateColorCodes('&', massage);
     }
