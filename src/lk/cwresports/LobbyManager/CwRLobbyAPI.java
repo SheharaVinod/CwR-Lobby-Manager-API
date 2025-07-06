@@ -36,8 +36,12 @@ public class CwRLobbyAPI extends JavaPlugin {
 
         // commands
         getCommand(SpawnCommand.NAME).setExecutor(new SpawnCommand());
-        getCommand(LobbyManagerCommand.NAME).setExecutor(new LobbyManagerCommand());
-        getCommand(LobbyManagerCommand.NAME).setTabCompleter(new LobbyManagerTab());
+
+        boolean shouldHide = getConfig().getBoolean("hide-lobby-manager-command", false);
+        if (!shouldHide) {
+            getCommand(LobbyManagerCommand.NAME).setExecutor(new LobbyManagerCommand(this));
+            getCommand(LobbyManagerCommand.NAME).setTabCompleter(new LobbyManagerTab());
+        }
 
 
         // events

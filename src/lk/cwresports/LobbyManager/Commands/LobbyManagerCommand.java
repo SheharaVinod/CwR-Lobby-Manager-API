@@ -1,12 +1,15 @@
 package lk.cwresports.LobbyManager.Commands;
 
 import lk.cwresports.LobbyManager.API.*;
+import lk.cwresports.LobbyManager.ConfigAndData.LobbyDataManager;
 import lk.cwresports.LobbyManager.Utils.PermissionNodes;
 import lk.cwresports.LobbyManager.Utils.TextStrings;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,6 +42,12 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_info,
             sub_save
     };
+
+    Plugin plugin;
+
+    public LobbyManagerCommand(Plugin plugin) {
+        this.plugin = plugin;
+    }
 
     private static final Set<Player> admins = new HashSet<>();
 
@@ -231,7 +240,7 @@ public class LobbyManagerCommand implements CommandExecutor {
 
     public boolean save(Player admin, String[] strings) {
         // TODO: save data.
-
+        new LobbyDataManager((JavaPlugin) this.plugin).saveData();
         return true;
     }
 
