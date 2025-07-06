@@ -61,7 +61,6 @@ public class LobbyManagerCommand implements CommandExecutor {
             return true;
         }
 
-        // TODO: toggle admin here.
         if (!(strings.length > 0)) {
             return help(admin, strings);
         } else {

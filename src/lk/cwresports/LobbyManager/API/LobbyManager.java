@@ -22,7 +22,7 @@ public class LobbyManager {
         plugin = CwRLobbyAPI.getPlugin();
 
         // creating instance.
-        getDefaultGroup();
+        // getDefaultGroup();
     }
 
     public void registerNameFor(Lobby lobby) {

@@ -9,8 +9,13 @@ commands:
   lobby-manager:
     description: Main command for setup lobbies and others.
     permission-message: You don't have permission to execute this command.
-    permission: cwr-core.lobby-manager.main
+    permission: cwr-core.lobby-manager.admin
     usage: /lobby-manager help
+  spawn:
+    description: spawn command
+    permission-message: You don't have permission to execute this command.
+    permission: cwr-core.lobby-manager.main
+    usage: /spawn
 
 permissions:
   cwr-core.lobby-manager.admin:

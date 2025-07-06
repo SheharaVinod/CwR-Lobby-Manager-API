@@ -19,6 +19,7 @@ public class CwRLobbyAPI extends JavaPlugin {
     @Override
     public void onLoad() {
         CwRLobbyAPI.plugin = this;
+        LobbyManager.getInstance();
     }
 
     @Override
@@ -30,7 +31,6 @@ public class CwRLobbyAPI extends JavaPlugin {
         TimeZoneHelper.load(this);
 
         // load lobby manager;
-        LobbyManager.getInstance();
         LobbyManager.getInstance().load();
 
 
