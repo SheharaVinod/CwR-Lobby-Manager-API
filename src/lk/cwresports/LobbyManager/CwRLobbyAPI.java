@@ -45,6 +45,10 @@ public class CwRLobbyAPI extends JavaPlugin {
         PlayerLeaveListener.register(this);
     }
 
+    @Override
+    public void onDisable() {
+        LobbyManager.getInstance().save();
+    }
 
     public static CwRLobbyAPI getPlugin() {
         return plugin;
