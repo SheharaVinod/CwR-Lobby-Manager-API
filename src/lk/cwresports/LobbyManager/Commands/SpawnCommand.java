@@ -1,6 +1,7 @@
 package lk.cwresports.LobbyManager.Commands;
 
 import lk.cwresports.LobbyManager.API.LobbyManager;
+import lk.cwresports.LobbyManager.Utils.TextStrings;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,6 +18,7 @@ public class SpawnCommand implements CommandExecutor {
 
         if (LobbyManager.isBlockedSpawnCommand(player)) {
             // TODO: send massage , "you cant use this command right now."
+            player.sendMessage(TextStrings.colorize("you cant use this command right now."));
             return true;
         }
 

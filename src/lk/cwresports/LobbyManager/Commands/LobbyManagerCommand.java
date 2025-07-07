@@ -239,7 +239,6 @@ public class LobbyManagerCommand implements CommandExecutor {
     }
 
     public boolean save(Player admin, String[] strings) {
-        // TODO: save data.
         new LobbyDataManager((JavaPlugin) this.plugin).saveData();
         return true;
     }
@@ -269,8 +268,4 @@ public class LobbyManagerCommand implements CommandExecutor {
         }
         return true;
     }
-
-
-
-
 }

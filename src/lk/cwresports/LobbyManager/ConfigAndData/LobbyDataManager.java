@@ -1,9 +1,9 @@
 package lk.cwresports.LobbyManager.ConfigAndData;
 
-import lk.cwresports.LobbyManager.API.LobbyManager;
-import lk.cwresports.LobbyManager.API.Lobby;
-import lk.cwresports.LobbyManager.API.LobbyGroup;
-import lk.cwresports.LobbyManager.API.EventLobbies;
+import lk.cwresports.LobbyManager.API.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -40,6 +40,21 @@ public class LobbyDataManager {
                 config.set(key, null);
             }
 
+            // Save all lobbies with their spawn locations
+            ConfigurationSection lobbiesSection = config.createSection("lobbies");
+            for (Map.Entry<String, Lobby> entry : lobbyManager.lobbyNameMap.entrySet()) {
+                Lobby lobby = entry.getValue();
+                ConfigurationSection lobbySection = lobbiesSection.createSection(lobby.getWorld().getName());
+
+                // Save spawn locations
+                List<String> serializedLocations = new ArrayList<>();
+                for (Location loc : lobby.getSpawnLocations()) {
+                    serializedLocations.add(serializeLocation(loc));
+                }
+                lobbySection.set("spawn_locations", serializedLocations);
+                lobbySection.set("location_type", lobby.getLocationTypes().name());
+            }
+
             // Save lobby groups and their lobbies
             ConfigurationSection groupsSection = config.createSection("groups");
             for (Map.Entry<String, LobbyGroup> entry : lobbyManager.lobbyGroupMap.entrySet()) {
@@ -53,7 +68,7 @@ public class LobbyDataManager {
                 }
                 groupSection.set("lobbies", lobbyNames);
 
-                // Save current lobby index if applicable
+                // Save current lobby
                 if (group.getCurrentLobby() != null) {
                     groupSection.set("current_lobby", group.getCurrentLobby().getWorld().getName());
                 }
@@ -84,7 +99,43 @@ public class LobbyDataManager {
 
         YamlConfiguration config = YamlConfiguration.loadConfiguration(dataFile);
 
-        // Load groups and their lobbies
+        // First load all lobbies with their spawn locations
+        ConfigurationSection lobbiesSection = config.getConfigurationSection("lobbies");
+        if (lobbiesSection != null) {
+            for (String lobbyName : lobbiesSection.getKeys(false)) {
+                ConfigurationSection lobbySection = lobbiesSection.getConfigurationSection(lobbyName);
+                World world = Bukkit.getWorld(lobbyName);
+                if (world == null) continue;
+
+                // Create a temporary location to initialize the lobby
+                Location tempLoc = world.getSpawnLocation();
+                Lobby lobby = new GroupLobbies(tempLoc); // This will register the lobby
+
+                // Clear default spawn location added in constructor
+                lobby.getSpawnLocations().clear();
+
+                // Load spawn locations
+                List<String> serializedLocations = lobbySection.getStringList("spawn_locations");
+                for (String serializedLoc : serializedLocations) {
+                    Location loc = deserializeLocation(serializedLoc);
+                    if (loc != null) {
+                        lobby.addSpawnLocation(loc);
+                    }
+                }
+
+                // Load location type
+                String locationType = lobbySection.getString("location_type");
+                if (locationType != null) {
+                    try {
+                        lobby.setLocationTypes(NextLocationTypes.valueOf(locationType));
+                    } catch (IllegalArgumentException e) {
+                        plugin.getLogger().warning("Invalid location type for lobby " + lobbyName);
+                    }
+                }
+            }
+        }
+
+        // Then load groups and assign lobbies to them
         ConfigurationSection groupsSection = config.getConfigurationSection("groups");
         if (groupsSection != null) {
             for (String groupName : groupsSection.getKeys(false)) {
@@ -129,6 +180,34 @@ public class LobbyDataManager {
             if (lobby instanceof EventLobbies) {
                 lobbyManager.getEventLobbies().add((EventLobbies) lobby);
             }
+        }
+    }
+
+    private String serializeLocation(Location location) {
+        return location.getWorld().getName() + "," +
+                location.getX() + "," +
+                location.getY() + "," +
+                location.getZ() + "," +
+                location.getYaw() + "," +
+                location.getPitch();
+    }
+
+    private Location deserializeLocation(String serialized) {
+        try {
+            String[] parts = serialized.split(",");
+            World world = Bukkit.getWorld(parts[0]);
+            if (world == null) return null;
+
+            double x = Double.parseDouble(parts[1]);
+            double y = Double.parseDouble(parts[2]);
+            double z = Double.parseDouble(parts[3]);
+            float yaw = Float.parseFloat(parts[4]);
+            float pitch = Float.parseFloat(parts[5]);
+
+            return new Location(world, x, y, z, yaw, pitch);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed to deserialize location: " + serialized);
+            return null;
         }
     }
 }

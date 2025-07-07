@@ -4,6 +4,7 @@ import lk.cwresports.LobbyManager.ConfigAndData.LobbyDataManager;
 import lk.cwresports.LobbyManager.CwRLobbyAPI;
 import lk.cwresports.LobbyManager.Utils.PermissionNodes;
 import lk.cwresports.LobbyManager.Utils.TextStrings;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -11,7 +12,7 @@ import java.util.*;
 public class LobbyManager {
     private static LobbyManager manager;
     public Map<String, LobbyGroup> lobbyGroupMap = new HashMap<>();
-    Map<String, Lobby> lobbyNameMap = new HashMap<>();
+    public Map<String, Lobby> lobbyNameMap = new HashMap<>();
 
     public Lobby defaultSelectedLobby;
     private final CwRLobbyAPI plugin;
@@ -93,6 +94,8 @@ public class LobbyManager {
     }
 
     public void sendToLobby(Player player) {
+        player.sendMessage(TextStrings.colorize("You are warping to lobby."));
+
         if (EventManager.getInstance().isInEvent()) {
             EventLobbies eventLobby = EventManager.getInstance().getEventLobby();
             if (eventLobby == null) return;
@@ -101,7 +104,10 @@ public class LobbyManager {
         }
 
         Lobby selectedLobbyOf = getSelectedLobbyOf(player);
-        if (selectedLobbyOf == null) return;
+        if (selectedLobbyOf == null) {
+            player.sendMessage(TextStrings.colorize("Error."));
+            return;
+        }
         selectedLobbyOf.send(player);
     }
 
@@ -178,6 +184,7 @@ public class LobbyManager {
             LobbyGroup default_group = new LobbyGroup(defaultKey);
             this.lobbyGroupMap.put(default_group.getName(), default_group);
         }
+        Bukkit.getLogger().info("default lobby sending.");
         return this.lobbyGroupMap.get(defaultKey);
     }
 }

@@ -21,6 +21,8 @@ public class LobbyGroup {
     public Lobby getCurrentLobby() {
         if (currentLobby == null) {
             // TODO:
+            if (lobbies.isEmpty()) return null;
+            else currentLobby = lobbies.get(0);
         }
         return currentLobby;
     }
@@ -51,6 +53,6 @@ public class LobbyGroup {
     }
 
     public void setCurrentLobby(Lobby currentLobby) {
-
+        this.currentLobby = currentLobby;
     }
 }
