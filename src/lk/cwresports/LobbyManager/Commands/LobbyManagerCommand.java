@@ -195,6 +195,7 @@ public class LobbyManagerCommand implements CommandExecutor {
             return true;
         }
         lobby.addSpawnLocation(location);
+        admin.sendMessage(TextStrings.colorize("add a new spawn location"));
         return true;
     }
 
@@ -208,6 +209,7 @@ public class LobbyManagerCommand implements CommandExecutor {
             return true;
         }
         lobby.setDefaultSpawnLocation(location);
+        admin.sendMessage(TextStrings.colorize("set default spawn location"));
         return true;
     }
 
@@ -235,6 +237,7 @@ public class LobbyManagerCommand implements CommandExecutor {
             admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
             return true;
         }
+        admin.sendMessage(TextStrings.colorize("removed.!"));
         return true;
     }
 
@@ -299,6 +302,7 @@ public class LobbyManagerCommand implements CommandExecutor {
         String group_name = strings[3];
 
         LobbyManager.getInstance().change_group_of(lobby_name, group_name, admin);
+        admin.sendMessage(TextStrings.colorize(TextStrings.SUCCESSFUL));
         return true;
     }
 
@@ -311,6 +315,7 @@ public class LobbyManagerCommand implements CommandExecutor {
 
     public boolean save(Player admin, String[] strings) {
         new LobbyDataManager((JavaPlugin) this.plugin).saveData();
+        admin.sendMessage(TextStrings.colorize("Saved.!"));
         return true;
     }
 

@@ -6,6 +6,9 @@ public class GroupLobbies  extends Lobby{
     public GroupLobbies(Location currentLocation) {
         super(currentLocation);
 
+        this.addSpawnLocation(currentLocation);
+        this.setDefaultSpawnLocation(currentLocation);
+
         // add to default group threw Manager
         LobbyManager.getInstance().getDefaultGroup().addLobby(this);
     }

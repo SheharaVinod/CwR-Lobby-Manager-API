@@ -21,8 +21,9 @@ public class Lobby {
     public Lobby(Location currentLocation) {
         this.world = currentLocation.getWorld();
         this.defaultSpawnLocation = currentLocation;
-        spawn_locations.add(currentLocation);
         this.nextLocation = currentLocation;
+
+        // spawn_locations.add(currentLocation);
 
         LobbyManager.getInstance().registerNameFor(this);
     }

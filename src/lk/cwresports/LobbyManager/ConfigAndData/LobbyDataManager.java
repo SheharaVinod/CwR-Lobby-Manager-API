@@ -107,15 +107,21 @@ public class LobbyDataManager {
                 World world = Bukkit.getWorld(lobbyName);
                 if (world == null) continue;
 
-                // Create a temporary location to initialize the lobby
-                Location tempLoc = world.getSpawnLocation();
-                Lobby lobby = new GroupLobbies(tempLoc); // This will register the lobby
+                // Load spawn locations first
+                List<String> serializedLocations = lobbySection.getStringList("spawn_locations");
+                if (serializedLocations.isEmpty()) continue;
 
-                // Clear default spawn location added in constructor
+                // Use the first saved location as the initial location
+                Location firstLoc = deserializeLocation(serializedLocations.get(0));
+                if (firstLoc == null) continue;
+
+                // Create lobby with the saved location
+                Lobby lobby = new GroupLobbies(firstLoc);
+
+                // Clear the default spawn location added in constructor
                 lobby.getSpawnLocations().clear();
 
-                // Load spawn locations
-                List<String> serializedLocations = lobbySection.getStringList("spawn_locations");
+                // Add all spawn locations
                 for (String serializedLoc : serializedLocations) {
                     Location loc = deserializeLocation(serializedLoc);
                     if (loc != null) {
