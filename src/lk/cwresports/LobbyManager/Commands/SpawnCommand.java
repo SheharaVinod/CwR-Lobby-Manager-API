@@ -102,6 +102,7 @@ public class SpawnCommand implements CommandExecutor {
     public static void canselMovedPlayer(Player player) {
         boolean should_afk = plugin.getConfig().getBoolean(CONFIG_SHOULD_AFK, true);
         if (!should_afk) return;
+        if (!que.contains(player)) return;
 
         BukkitRunnable queRunnable = que_runnable.get(player);
         if (queRunnable != null) {
