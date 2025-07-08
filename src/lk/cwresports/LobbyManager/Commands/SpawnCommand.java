@@ -9,11 +9,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class SpawnCommand implements CommandExecutor {
     public static final String NAME = "spawn";
     private static int cool_down = 0;
     public static final String CONFIG_SPAWN_COOL_DOWN = "spawn-command-cool-down-in-sec";
+    public static final String CONFIG_SHOULD_AFK = "should-afk-for-teleport";
     private static Plugin plugin;
+    private static final Set<Player> que = new HashSet<>();
+    private static final Map<Player, BukkitRunnable> que_runnable = new HashMap<>();
+
 
     public SpawnCommand(Plugin plugin) {
         SpawnCommand.plugin = plugin;
@@ -31,10 +40,13 @@ public class SpawnCommand implements CommandExecutor {
             return true;
         }
 
+        if (que.contains(player)) return true;
+
         if (cool_down == 0 || plugin == null) {
-            LobbyManager.getInstance().sendToLobby(player);
+            que.add(player);
+            sendToLobby(player);
         } else {
-            new BukkitRunnable() {
+            BukkitRunnable que_runnable_ = new BukkitRunnable() {
                 int sec = cool_down;
 
                 @Override
@@ -43,16 +55,30 @@ public class SpawnCommand implements CommandExecutor {
                         cancel();
                         return;
                     }
-                    player.sendMessage(TextStrings.colorize("You will teleported in " + sec + " sec."));
                     if (sec == 0) {
-                        LobbyManager.getInstance().sendToLobby(player);
+                        sendToLobby(player);
                     }
+                    player.sendMessage(TextStrings.colorize("&7You will teleported in &f" + sec + "&7 sec."));
                     sec--;
                 }
-            }.runTaskTimer(plugin, 0, cool_down * 20L);
+
+                @Override
+                public synchronized void cancel() throws IllegalStateException {
+                    super.cancel();
+                    que.remove(player);
+                }
+            };
+
+            que_runnable.put(player, que_runnable_);
+            que_runnable_.runTaskTimer(plugin, 0, 20L);
         }
 
         return true;
+    }
+
+    private void sendToLobby(Player player) {
+        que.remove(player);
+        LobbyManager.getInstance().sendToLobby(player);
     }
 
     public static void set_cool_down(int cool_down) {
@@ -71,5 +97,25 @@ public class SpawnCommand implements CommandExecutor {
         SpawnCommand.cool_down = cool_down;
         if (plugin == null || !save) return;
         plugin.getConfig().set("spawn-command-cool-down-in-sec", cool_down);
+    }
+
+    public static void canselMovedPlayer(Player player) {
+        boolean should_afk = plugin.getConfig().getBoolean(CONFIG_SHOULD_AFK, true);
+        if (!should_afk) return;
+
+        BukkitRunnable queRunnable = que_runnable.get(player);
+        if (queRunnable != null) {
+            queRunnable.cancel();
+        }
+        que.remove(player);
+        player.sendMessage(TextStrings.colorize("&7Teleportation cancelled."));
+    }
+
+    public static void removeQue(Player player) {
+        BukkitRunnable runnable = que_runnable.get(player);
+        if (runnable != null && runnable.getTaskId() != -1) {
+            runnable.cancel();
+        }
+        que.remove(player);
     }
 }

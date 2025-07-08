@@ -26,6 +26,10 @@ permissions:
     default: op
     description: normal commands.
 
+  cwr-core.lobby-manager.gui.spawn-selector:
+    default: op
+    description: spawn selector.
+
   cwr-core.lobby-manager.lobbies.default:
     default: true
     description: default lobby.

@@ -2,6 +2,7 @@ package lk.cwresports.LobbyManager.Events;
 
 import lk.cwresports.LobbyManager.API.LobbyManager;
 import lk.cwresports.LobbyManager.Commands.LobbyManagerCommand;
+import lk.cwresports.LobbyManager.Commands.SpawnCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,6 +18,8 @@ public class PlayerLeaveListener implements Listener {
         if (LobbyManagerCommand.isAdmin(player)) {
             LobbyManagerCommand.removeAdmin(player);
         }
+
+        SpawnCommand.removeQue(player);
     }
 
     public static void register(Plugin plugin) {
