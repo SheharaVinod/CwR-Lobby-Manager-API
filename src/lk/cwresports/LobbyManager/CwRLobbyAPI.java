@@ -35,7 +35,8 @@ public class CwRLobbyAPI extends JavaPlugin {
 
 
         // commands
-        getCommand(SpawnCommand.NAME).setExecutor(new SpawnCommand());
+        getCommand(SpawnCommand.NAME).setExecutor(new SpawnCommand(this));
+        SpawnCommand.set_cool_down(getConfig().getInt(SpawnCommand.CONFIG_SPAWN_COOL_DOWN, 5), false);
 
         boolean shouldHide = getConfig().getBoolean("hide-lobby-manager-command", false);
         if (!shouldHide) {

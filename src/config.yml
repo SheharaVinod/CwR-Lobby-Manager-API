@@ -1,4 +1,4 @@
 # lobby manager
 # you can set this to true after you config the server; if you want.
 hide-lobby-manager-command: false
-
+spawn-command-cool-down-in-sec: 5

@@ -28,6 +28,8 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_set_default_spawn = "set_default_spawn";
     public static final String sub_remove_spawn_location_by_index = "remove_spawn_location_by_index";
 
+    public static final String sub_set_spawn_cool_down = "set_spawn_cool_down";
+
     public static final String sub_change_lobby_spawn_rotation = "change_lobby_spawn_rotation";
     public static final String sub_change_group_of = "change_group_of";
     public static final String sub_admin = "admin";
@@ -44,6 +46,7 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_delete_lobby,
             sub_remove_spawn_location_by_index,
             sub_add_a_new_spawn,
+            sub_set_spawn_cool_down,
             sub_set_default_spawn,
             sub_change_lobby_spawn_rotation,
             sub_change_group_of,
@@ -121,6 +124,8 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return set_default_spawn(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_remove_spawn_location_by_index)) {
                 return remove_spawn_location_by_index(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_set_spawn_cool_down)) {
+                return set_spawn_cool_down(admin, strings);
             }
         }
 
@@ -341,6 +346,19 @@ public class LobbyManagerCommand implements CommandExecutor {
         } catch (IllegalArgumentException e) {
             // ignore.
             admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+        }
+        return true;
+    }
+
+
+    public boolean set_spawn_cool_down(Player admin, String[] strings) {
+        // /lobby-manager set_spawn_cool_down <int>
+        if (strings.length < 2) return false;
+        String string = strings[1];
+        try {
+            SpawnCommand.set_cool_down(Integer.parseInt(string));
+        } catch (Exception e) {
+            return false;
         }
         return true;
     }
