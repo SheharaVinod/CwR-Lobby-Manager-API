@@ -16,13 +16,14 @@ public class LobbyGroup {
 
     public void saveToConfig() {
         // TODO: save this in config file.
+
     }
 
     public Lobby getCurrentLobby() {
         if (currentLobby == null) {
             // TODO:
             if (lobbies.isEmpty()) return null;
-            else currentLobby = lobbies.get(0);
+            else currentLobby = lobbies.get(0); // TODO: incomplete.
         }
         return currentLobby;
     }
@@ -46,6 +47,10 @@ public class LobbyGroup {
 
     public void removeLobby(Lobby lobby) {
         this.lobbies.remove(lobby);
+        // If we're removing the current lobby, set it to null
+        if (currentLobby == lobby) {
+            currentLobby = null;
+        }
     }
 
     public boolean hasLobby(Lobby lobby) {

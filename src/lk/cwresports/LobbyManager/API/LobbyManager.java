@@ -94,6 +94,7 @@ public class LobbyManager {
     }
 
     public void sendToLobby(Player player) {
+        // TODO: delete.
         player.sendMessage(TextStrings.colorize("You are warping to lobby."));
 
         if (EventManager.getInstance().isInEvent()) {
@@ -105,6 +106,7 @@ public class LobbyManager {
 
         Lobby selectedLobbyOf = getSelectedLobbyOf(player);
         if (selectedLobbyOf == null) {
+            // TODO: delete.
             player.sendMessage(TextStrings.colorize("Error."));
             return;
         }
@@ -129,15 +131,30 @@ public class LobbyManager {
     public boolean unregisterLobbyGroup(String name) {
         LobbyGroup group = this.lobbyGroupMap.get(name);
         if (group == null) return false;
-        for (Lobby lobby : group.getLobbies()) {
-            deleteLobby(lobby.getWorld().getName());
-        }
+
+        // Remove all lobbies from this group (but don't delete the lobbies themselves)
+        group.getLobbies().clear();
+
         this.lobbyGroupMap.remove(name);
         return true;
     }
 
     public void deleteLobby(String name) {
-        lobbyNameMap.remove(name);
+        Lobby lobby = lobbyNameMap.get(name);
+        if (lobby != null) {
+            // Remove from all groups
+            for (LobbyGroup group : lobbyGroupMap.values()) {
+                group.removeLobby(lobby);
+            }
+
+            // Remove from event lobbies if it's an event lobby
+            if (lobby instanceof EventLobbies) {
+                eventLobbies.remove(lobby);
+            }
+
+            // Remove from name map
+            lobbyNameMap.remove(name);
+        }
     }
 
     public void registerLobbyGroup(LobbyGroup lobbyGroup) {

@@ -13,7 +13,7 @@ import java.util.UUID;
 public class Lobby {
     private final World world;
     private final List<Location> spawn_locations = new ArrayList<>();
-    private final Location defaultSpawnLocation;
+    private Location defaultSpawnLocation;
     private Location nextLocation;
     private NextLocationTypes locationTypes = NextLocationTypes.DEFAULT;
     private final Random random = new Random();
@@ -37,11 +37,19 @@ public class Lobby {
         }
     }
 
+    public void setDefaultSpawnLocation(Location location) {
+        if (location == null) return;
+        this.defaultSpawnLocation = location;
+        this.spawn_locations.remove(0);
+        this.spawn_locations.add(0, location);
+    }
+
     public World getWorld() {
         return world;
     }
 
     public void removeSpawnLocation(int index) {
+        if (index == 0) return;
         spawn_locations.remove(index);
     }
 

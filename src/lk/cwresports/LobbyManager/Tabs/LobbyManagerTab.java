@@ -23,14 +23,25 @@ public class LobbyManagerTab implements TabCompleter {
             if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_create_group)) {
                 String[] name = {admin.getWorld().getName() + "_group"};
                 return List.of(name);
+
+
             } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_change_lobby_spawn_rotation)) {
                 String[] type = {"DEFAULT", "RANDOM", "CIRCULAR"};
                 return List.of(type);
+
+
             } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_change_group_of)) {
                 if (strings.length > 2) {
                     return LobbyManager.getInstance().getGroups();
                 }
                 return LobbyManager.getInstance().getGroupedLobbies();
+
+
+            } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_remove_spawn_location_by_index)) {
+                String[] index = {"1", "2", "3", "-1"};
+                return List.of(index);
+
+
             } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_set_period)) {
                 // /lobby-manager set_period <MM-DD-HH-mm-ss> <days> <timezone>
                 //                 0             1             2       3

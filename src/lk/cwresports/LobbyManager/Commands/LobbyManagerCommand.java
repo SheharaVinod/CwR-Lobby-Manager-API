@@ -4,6 +4,7 @@ import lk.cwresports.LobbyManager.API.*;
 import lk.cwresports.LobbyManager.ConfigAndData.LobbyDataManager;
 import lk.cwresports.LobbyManager.Utils.PermissionNodes;
 import lk.cwresports.LobbyManager.Utils.TextStrings;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,7 +21,13 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_create_group = "create_group";
     public static final String sub_delete_group = "delete_group";
     public static final String sub_create_lobby = "create_lobby";
+    public static final String sub_create_event_lobby = "create_event_lobby";
     public static final String sub_delete_lobby = "delete_lobby";
+
+    public static final String sub_add_a_new_spawn = "add_a_new_spawn";
+    public static final String sub_set_default_spawn = "set_default_spawn";
+    public static final String sub_remove_spawn_location_by_index = "remove_spawn_location_by_index";
+
     public static final String sub_change_lobby_spawn_rotation = "change_lobby_spawn_rotation";
     public static final String sub_change_group_of = "change_group_of";
     public static final String sub_admin = "admin";
@@ -33,7 +40,11 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_create_group,
             sub_delete_group,
             sub_create_lobby,
+            sub_create_event_lobby,
             sub_delete_lobby,
+            sub_remove_spawn_location_by_index,
+            sub_add_a_new_spawn,
+            sub_set_default_spawn,
             sub_change_lobby_spawn_rotation,
             sub_change_group_of,
             sub_admin,
@@ -90,19 +101,26 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return info(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_create_lobby)) {
                 return create_lobby(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_create_event_lobby)) {
+                return create_event_lobby(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_create_group)) {
                 return create_group(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_change_group_of)) {
                 return change_group_of(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_change_lobby_spawn_rotation)) {
                 return change_lobby_spawn_rotation(admin, strings);
-            }
-            else if (strings[0].equalsIgnoreCase(sub_set_period)) {
+            } else if (strings[0].equalsIgnoreCase(sub_set_period)) {
                 return set_period(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_delete_group)) {
                 return delete_group(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_delete_lobby)) {
                 return delete_lobby(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_add_a_new_spawn)) {
+                return add_a_new_spawn(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_set_default_spawn)) {
+                return set_default_spawn(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_remove_spawn_location_by_index)) {
+                return remove_spawn_location_by_index(admin, strings);
             }
         }
 
@@ -164,6 +182,59 @@ public class LobbyManagerCommand implements CommandExecutor {
         if (strings.length < 2) return false;
         boolean isDeleted = LobbyManager.getInstance().unregisterLobbyGroup(strings[1]);
         admin.sendMessage(TextStrings.colorize("is group deleted : " + isDeleted));
+        return true;
+    }
+
+    public boolean add_a_new_spawn(Player admin, String[] strings) {
+        //lobby-manager add_a_new_spawn
+        String worldName = admin.getWorld().getName();
+        Location location = admin.getLocation();
+        Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+        if (lobby == null) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        lobby.addSpawnLocation(location);
+        return true;
+    }
+
+    public boolean set_default_spawn(Player admin, String[] strings) {
+        //lobby-manager set_default_spawn
+        String worldName = admin.getWorld().getName();
+        Location location = admin.getLocation();
+        Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+        if (lobby == null) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        lobby.setDefaultSpawnLocation(location);
+        return true;
+    }
+
+    public boolean remove_spawn_location_by_index(Player admin, String[] strings) {
+        //lobby-manager remove_spawn_location_by_id [1,2,3]
+        if (strings.length < 2) {
+            return false;
+        }
+
+        String worldName = admin.getWorld().getName();
+        LobbyManager lobbyManager = LobbyManager.getInstance();
+        Lobby lobby = lobbyManager.getLobbyByName(worldName);
+        if (lobby == null) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        try {
+            int index = Integer.parseInt(strings[1]);
+            if (index < 0) {
+                lobby.removeSpawnLocation(lobby.getSpawnLocations().size() + index);
+            } else {
+                lobby.removeSpawnLocation(index);
+            }
+        } catch (Exception e) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
         return true;
     }
 
@@ -256,8 +327,8 @@ public class LobbyManagerCommand implements CommandExecutor {
             admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
             return true;
         }
-        String type = strings[2];
         try {
+        String type = strings[1];
             NextLocationTypes nextLocationTypes = NextLocationTypes.valueOf(type);
             Lobby lobby = LobbyManager.getInstance().getLobbyByName(admin.getWorld().getName());
             lobby.setLocationTypes(nextLocationTypes);
