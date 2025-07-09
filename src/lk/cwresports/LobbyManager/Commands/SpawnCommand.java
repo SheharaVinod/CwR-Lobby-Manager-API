@@ -44,11 +44,20 @@ public class SpawnCommand implements CommandExecutor {
 
         if (cool_down == 0 || plugin == null) {
             que.add(player);
+            player.setVelocity(new Vector(0, 0, 0));
+
             sendToLobby(player);
         } else {
             que.add(player);
             // this is for move event correction.
             player.setVelocity(new Vector(0, 0, 0));
+
+            if (player.hasPermission("cwr-core.lobby-manager.admin")) {
+                if (plugin.getConfig().getBoolean("should-afk-admins-for-teleport", true)) {
+                    sendToLobby(player);
+                    return true;
+                }
+            }
 
             BukkitRunnable que_runnable_ = new BukkitRunnable() {
                 int sec = cool_down;
@@ -79,6 +88,7 @@ public class SpawnCommand implements CommandExecutor {
 
             que_runnable.put(player, que_runnable_);
             que_runnable_.runTaskTimer(plugin, 0, 20L);
+
         }
 
         return true;

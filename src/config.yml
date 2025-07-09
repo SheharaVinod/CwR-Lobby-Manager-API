@@ -5,7 +5,7 @@ hide-lobby-manager-command: false
 # this section is used to manage /spawn command.
 spawn-command-cool-down-in-sec: 1
 should-afk-for-teleport: true
-should-afk-for-teleport-for-admins: false
+should-afk-admins-for-teleport: false
 
 #    MINUTE,
 #    HOUR,
