@@ -16,6 +16,11 @@ commands:
     permission-message: You don't have permission to execute this command.
     permission: cwr-core.lobby-manager.main
     usage: /spawn
+  select-spawn:
+    description: select spawn
+    permission-message: You don't have permission to execute this command.
+    permission: cwr-core.lobby-manager.gui.spawn-selector
+    usage: /select-spawn
 
 permissions:
   cwr-core.lobby-manager.admin:

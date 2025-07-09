@@ -94,9 +94,6 @@ public class LobbyManager {
     }
 
     public void sendToLobby(Player player) {
-        // TODO: delete.
-        player.sendMessage(TextStrings.colorize("You are warping to lobby."));
-
         if (EventManager.getInstance().isInEvent()) {
             EventLobbies eventLobby = EventManager.getInstance().getEventLobby();
             if (eventLobby == null) return;
@@ -106,8 +103,6 @@ public class LobbyManager {
 
         Lobby selectedLobbyOf = getSelectedLobbyOf(player);
         if (selectedLobbyOf == null) {
-            // TODO: delete.
-            player.sendMessage(TextStrings.colorize("Error."));
             return;
         }
         selectedLobbyOf.send(player);

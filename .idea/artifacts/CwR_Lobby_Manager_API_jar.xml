@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" build-on-make="true" name="CwR-Lobby-Manager-API:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/CwR_Lobby_Manager_API_jar</output-path>
+    <output-path>$PROJECT_DIR$/../../minecraft/CaptureTheFlagMinecraftServer/plugins</output-path>
     <root id="archive" name="CwR-Lobby-Manager-API.jar">
       <element id="module-output" name="CwR-Lobby-Manager-API" />
       <element id="file-copy" path="$PROJECT_DIR$/src/timezones.json" />

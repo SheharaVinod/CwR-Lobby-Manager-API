@@ -1,6 +1,6 @@
 package lk.cwresports.LobbyManager.API;
 
-public enum NextLobbyRotationTypes {
+public enum LobbyRotationTypes {
     CIRCULAR,
     RANDOM
 }

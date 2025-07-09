@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,8 +36,7 @@ public class SpawnCommand implements CommandExecutor {
         }
 
         if (LobbyManager.isBlockedSpawnCommand(player)) {
-            // TODO: send massage , "you cant use this command right now."
-            player.sendMessage(TextStrings.colorize("you cant use this command right now."));
+            player.sendMessage(TextStrings.colorize("you cant use this command right now.", false));
             return true;
         }
 
@@ -46,19 +46,27 @@ public class SpawnCommand implements CommandExecutor {
             que.add(player);
             sendToLobby(player);
         } else {
+            que.add(player);
+            // this is for move event correction.
+            player.setVelocity(new Vector(0, 0, 0));
+
             BukkitRunnable que_runnable_ = new BukkitRunnable() {
                 int sec = cool_down;
 
                 @Override
                 public void run() {
-                    if (!player.isOnline()) {
+                    if (!player.isOnline() || sec < 0) {
                         cancel();
                         return;
                     }
+
                     if (sec == 0) {
                         sendToLobby(player);
+                        cancel();
+                        return;
                     }
-                    player.sendMessage(TextStrings.colorize("&7You will teleported in &f" + sec + "&7 sec."));
+
+                    player.sendMessage(TextStrings.colorize("&7You will teleported in &f" + sec + "&7 sec.", false));
                     sec--;
                 }
 
@@ -79,6 +87,14 @@ public class SpawnCommand implements CommandExecutor {
     private void sendToLobby(Player player) {
         que.remove(player);
         LobbyManager.getInstance().sendToLobby(player);
+        remove_from_que_runnable_map(player);
+    }
+
+    private static void remove_from_que_runnable_map(Player player) {
+        BukkitRunnable runnable = que_runnable.get(player);
+        if (runnable != null && runnable.getTaskId() != -1) {
+            runnable.cancel();
+        }
     }
 
     public static void set_cool_down(int cool_down) {
@@ -88,6 +104,7 @@ public class SpawnCommand implements CommandExecutor {
         SpawnCommand.cool_down = cool_down;
         if (plugin == null) return;
         plugin.getConfig().set("spawn-command-cool-down-in-sec", cool_down);
+        plugin.saveConfig();
     }
 
     public static void set_cool_down(int cool_down, boolean save) {
@@ -97,6 +114,7 @@ public class SpawnCommand implements CommandExecutor {
         SpawnCommand.cool_down = cool_down;
         if (plugin == null || !save) return;
         plugin.getConfig().set("spawn-command-cool-down-in-sec", cool_down);
+        plugin.saveConfig();
     }
 
     public static void canselMovedPlayer(Player player) {
@@ -109,14 +127,11 @@ public class SpawnCommand implements CommandExecutor {
             queRunnable.cancel();
         }
         que.remove(player);
-        player.sendMessage(TextStrings.colorize("&7Teleportation cancelled."));
+        player.sendMessage(TextStrings.colorize("&7Teleportation cancelled.", false));
     }
 
     public static void removeQue(Player player) {
-        BukkitRunnable runnable = que_runnable.get(player);
-        if (runnable != null && runnable.getTaskId() != -1) {
-            runnable.cancel();
-        }
+        remove_from_que_runnable_map(player);
         que.remove(player);
     }
 }

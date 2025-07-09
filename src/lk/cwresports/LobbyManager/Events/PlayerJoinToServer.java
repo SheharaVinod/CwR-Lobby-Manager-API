@@ -2,6 +2,7 @@ package lk.cwresports.LobbyManager.Events;
 
 import lk.cwresports.LobbyManager.API.LobbyManager;
 import lk.cwresports.LobbyManager.Commands.SpawnCommand;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,7 +22,16 @@ public class PlayerJoinToServer implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        SpawnCommand.canselMovedPlayer(player);
+        Location from = event.getFrom();
+        Location to = event.getTo();
+
+        boolean x = from.getX() != to.getX();
+        boolean y = from.getY() != to.getY();
+        boolean z = from.getZ() != to.getZ();
+
+        if (x || y || z) {
+            SpawnCommand.canselMovedPlayer(player);
+        }
     }
 
     public static void register(Plugin plugin) {
