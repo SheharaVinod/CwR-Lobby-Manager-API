@@ -32,7 +32,7 @@ public class EventLobbies extends Lobby {
 
         try {
             String[] parts = eventDate.split("-");
-            int month = Integer.parseInt(parts[0]) - 1; // Calendar uses 0-based months
+            int month = Integer.parseInt(parts[0]) - 1; // calendar uses 0 based months
             int day = Integer.parseInt(parts[1]);
             int hour = Integer.parseInt(parts[2]);
             int minute = Integer.parseInt(parts[3]);

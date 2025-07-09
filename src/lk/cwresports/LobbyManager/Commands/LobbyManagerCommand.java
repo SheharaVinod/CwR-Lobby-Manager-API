@@ -29,7 +29,7 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_remove_spawn_location_by_index = "remove_spawn_location_by_index";
 
     public static final String sub_set_spawn_cool_down = "set_spawn_cool_down";
-    public static final String sub_change_lobby_lobby_rotation = "change_lobby_rotation_type"; // TODO:
+    public static final String sub_change_lobby_rotation = "change_lobby_rotation_type"; // TODO:
 
     public static final String sub_change_lobby_spawn_rotation = "change_spawn_rotation_type";
     public static final String sub_change_group_of = "change_group_of";
