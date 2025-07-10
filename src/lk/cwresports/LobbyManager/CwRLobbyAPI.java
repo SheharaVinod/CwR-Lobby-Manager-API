@@ -2,11 +2,14 @@ package lk.cwresports.LobbyManager;
 
 import lk.cwresports.LobbyManager.API.LobbyManager;
 import lk.cwresports.LobbyManager.Commands.LobbyManagerCommand;
+import lk.cwresports.LobbyManager.Commands.SelectSpawnCommand;
 import lk.cwresports.LobbyManager.Commands.SpawnCommand;
 import lk.cwresports.LobbyManager.ConfigAndData.PlayerDataManager;
 import lk.cwresports.LobbyManager.Events.PlayerJoinToServer;
 import lk.cwresports.LobbyManager.Events.PlayerLeaveListener;
 import lk.cwresports.LobbyManager.Tabs.LobbyManagerTab;
+import lk.cwresports.LobbyManager.Tabs.SelectSpawnTab;
+import lk.cwresports.LobbyManager.Utils.RotationCalculator;
 import lk.cwresports.LobbyManager.Utils.TimeZoneHelper;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,6 +29,7 @@ public class CwRLobbyAPI extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         playerData = new PlayerDataManager(this);
+        RotationCalculator.init(this);
 
         // Load timezone data
         TimeZoneHelper.load(this);
@@ -44,6 +48,8 @@ public class CwRLobbyAPI extends JavaPlugin {
             getCommand(LobbyManagerCommand.NAME).setTabCompleter(new LobbyManagerTab());
         }
 
+        getCommand(SelectSpawnCommand.NAME).setExecutor(new SelectSpawnCommand(playerData));
+        getCommand(SelectSpawnCommand.NAME).setTabCompleter(new SelectSpawnTab());
 
 
         // events

@@ -202,12 +202,14 @@ public class LobbyManager {
         return manager;
     }
 
-
     private LobbyGroup getLobbyGroupOf(Player player) {
         if (playerIsMoreThanDefault(player)) {
-            // TODO: read player data and get what category he selected.
+            String groupName = plugin.getPlayerDataManager().getSelectedGroup(player);
+            LobbyGroup group = lobbyGroupMap.get(groupName);
 
-            return getDefaultGroup();
+            if (group != null && player.hasPermission("cwr-core.lobby-manager.spawn." + groupName)) {
+                return group;
+            }
         }
         return getDefaultGroup();
     }

@@ -17,5 +17,4 @@ should-afk-admins-for-teleport: false
 # mean , when you config the lobbies in the middle of the year like jul 9. it calculates and save started day as jul 1 00:00AM ,this is for better rotation.
 auto-rotate-lobbies-every: MANUAL
 
-
-
+time-offset: 5.5

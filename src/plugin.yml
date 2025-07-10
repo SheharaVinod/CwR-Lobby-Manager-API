@@ -33,12 +33,16 @@ permissions:
 
   cwr-core.lobby-manager.gui.spawn-selector:
     default: op
-    description: spawn selector.
+    description: spawn selector GUI.
+
+  cwr-core.lobby-manager.spawn.default:
+    default: true
+    description: any player can select default group.
 
   cwr-core.lobby-manager.lobbies.default:
     default: true
     description: default lobby.
 
   cwr-core.lobby-manager.lobbies.others:
-    default: false
+    default: op
     description: special lobby.

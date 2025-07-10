@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.UUID;
 
 public class PlayerDataManager {
@@ -52,12 +51,28 @@ public class PlayerDataManager {
         }
     }
 
-    public void setAndSave(Player player, String configSection, Objects value) {
+    public void setAndSave(Player player, String configSection, Object value) {
         FileConfiguration playerData = getPlayerData(player.getUniqueId());
         playerData.set(configSection, value);
         savePlayerData(player.getUniqueId(), playerData);
     }
 
+    public String getSelectedGroup(Player player) {
+        File playerFile = getPlayerFile(player.getUniqueId());
+        if (!playerFile.exists()) {
+            return "default";
+        }
+
+        FileConfiguration config = getPlayerData(player.getUniqueId());
+        return config.getString("selected-group", "default");
+    }
+
+    public void deleteFileOf(Player player) {
+        File playerFile = getPlayerFile(player.getUniqueId());
+        if (playerFile.exists()) {
+            playerFile.delete();
+        }
+    }
     public void savePlayer(Player player) {
         LobbyManager manager = LobbyManager.getInstance();
         LobbyGroup group = manager.getLobbyGroup("default");

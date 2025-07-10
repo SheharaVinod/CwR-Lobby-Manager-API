@@ -49,6 +49,10 @@ public class LobbyGroup {
         }
     }
 
+    public String getLobbyRotationType() {
+        return this.lobbyRotationType.toString();
+    }
+
     public boolean setLobbyRotationType(String lobbyRotationType) {
         try {
             this.lobbyRotationType = LobbyRotationTypes.valueOf(lobbyRotationType);

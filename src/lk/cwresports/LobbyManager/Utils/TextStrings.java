@@ -7,6 +7,8 @@ public class TextStrings {
     public static String YOU_ARE_NOT_AN_ADMIN = "&4You are not an admin.!";
     public static String YOU_ARE_NOW_IN_ADMIN_MOD = "&6You are now in admin mod.!";
 
+    public static String ONLY_PLAYERS_CAN_EXECUTE_THIS_COMMAND = "&6Only players can execute this command.";
+
     public static String YOU_CANT_CREATE_DEFAULT_GROUP = "&4You are not able to create a new default group.!";
     public static String YOU_CANT_CREATE_BLANK_GROUP = "&4You are not able to create a anonymous group.!";
     public static String GROUP_CREATED_SUCCESSFULLY = "&6Group created successfully.";

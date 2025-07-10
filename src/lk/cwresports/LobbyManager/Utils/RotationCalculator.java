@@ -3,11 +3,21 @@ package lk.cwresports.LobbyManager.Utils;
 import java.util.Calendar;
 
 import lk.cwresports.LobbyManager.API.TimeUnits;
+import lk.cwresports.LobbyManager.CwRLobbyAPI;
 
 public class RotationCalculator {
+    private static double timeOffsetHours = 5.5;
+
+    public static void init(CwRLobbyAPI plugin) {
+        timeOffsetHours = plugin.getConfig().getDouble("time-offset", 5.5);
+    }
 
     public static long calculateNextRotation(TimeUnits unit) {
         Calendar calendar = Calendar.getInstance();
+
+        // Apply time offset
+        calendar.add(Calendar.MILLISECOND, (int)(timeOffsetHours * 3600000));
+
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
@@ -45,6 +55,8 @@ public class RotationCalculator {
             default:
                 return -1;
         }
+
+        calendar.add(Calendar.MILLISECOND, (int)(-timeOffsetHours * 3600000));
 
         return calendar.getTimeInMillis();
     }

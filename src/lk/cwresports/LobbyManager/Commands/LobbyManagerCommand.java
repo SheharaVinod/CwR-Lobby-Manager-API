@@ -34,6 +34,7 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_change_lobby_rotation = "change_lobby_rotation_type";
     public static final String sub_set_group_lobby_rotation_time = "set_group_lobby_rotation_time";
     public static final String sub_rotate_every_lobby_group = "rotate_every_lobby_group";
+    public static final String sub_info_of_all_groups = "info_of_all_groups";
 
     public static final String sub_change_lobby_spawn_rotation = "change_spawn_rotation_type";
     public static final String sub_change_group_of = "change_group_of";
@@ -62,7 +63,8 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_save,
             sub_change_lobby_rotation,
             sub_set_group_lobby_rotation_time,
-            sub_rotate_every_lobby_group
+            sub_rotate_every_lobby_group,
+            sub_info_of_all_groups
     };
 
     Plugin plugin;
@@ -140,12 +142,50 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return set_group_lobby_rotation_time(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_rotate_every_lobby_group)) {
                 return rotate_every_lobby_group(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_info_of_all_groups)) {
+                return info_of_all_groups(admin, strings);
             }
         }
 
         return true;
     }
 
+    public boolean info_of_all_groups(Player admin, String[] strings) {
+        LobbyManager lobbyManager = LobbyManager.getInstance();
+
+        if (lobbyManager.lobbyGroupMap.isEmpty()) {
+            admin.sendMessage("§cNo groups found!");
+            return true;
+        }
+
+        admin.sendMessage("§6§lLobby Groups Information:");
+        admin.sendMessage("§7----------------------------");
+
+        for (LobbyGroup group : lobbyManager.lobbyGroupMap.values()) {
+            StringBuilder info = new StringBuilder();
+            info.append("§e").append(group.getName()).append("§7: ");
+
+            if (group.getLobbies().isEmpty()) {
+                info.append("§cNo lobbies");
+            } else {
+                for (Lobby lobby : group.getLobbies()) {
+                    String currentIndicator = (lobby == group.getCurrentLobby()) ? "§a➤" : "";
+                    info.append(currentIndicator).append(lobby.getWorld().getName()).append("§7, ");
+                }
+                // Remove last comma
+                info.setLength(info.length() - 2);
+            }
+
+            // Add rotation info
+            info.append("\n§7Rotation: §e").append(group.getLobbyRotationType())
+                    .append(" §7| Schedule: §e").append(group.getLobbyRotationTimeUnit());
+
+            admin.sendMessage(info.toString());
+            admin.sendMessage("§7----------------------------");
+        }
+
+        return true;
+    }
 
     private boolean change_lobby_rotation(Player admin, String[] strings) {
         if (strings.length < 3) {
@@ -208,13 +248,14 @@ public class LobbyManagerCommand implements CommandExecutor {
 
     private boolean rotate_every_lobby_group(Player admin, String[] strings) {
         for (LobbyGroup group : LobbyManager.getInstance().lobbyGroupMap.values()) {
+            // Remove manual check to force rotation
+            group.changeCurrentLobby();
             if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL) {
-                group.changeCurrentLobby();
-                if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL) {
-                    group.setNextRotationTime(RotationCalculator.calculateNextRotation(
-                            group.getLobbyRotationTimeUnit()
-                    ));
-                }
+                group.setNextRotationTime(
+                        RotationCalculator.calculateNextRotation(
+                                group.getLobbyRotationTimeUnit()
+                        )
+                );
             }
         }
         admin.sendMessage("§aAll groups rotated!");
