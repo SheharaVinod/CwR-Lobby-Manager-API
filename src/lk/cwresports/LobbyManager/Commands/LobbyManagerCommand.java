@@ -165,8 +165,12 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return true;
             }
 
-            group.setLobbyRotationType(rotationType.name());
-            admin.sendMessage("§aRotation type set to " + type);
+            if (group.setLobbyRotationType(rotationType.name())) {
+                admin.sendMessage(TextStrings.colorize(TextStrings.SUCCESSFUL));
+                admin.sendMessage("§aRotation type set to " + type);
+            } else {
+                admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            }
         } catch (IllegalArgumentException e) {
             admin.sendMessage("§cInvalid rotation type! Use RANDOM or CIRCULAR");
         }
