@@ -11,6 +11,10 @@ public class LobbyGroup {
     private LobbyRotationTypes lobbyRotationType = LobbyRotationTypes.CIRCULAR;
     private final Random random = new Random();
 
+    private TimeUnits lobbyRotationTimeUnit = TimeUnits.MANUAL;
+    private long nextRotationTime = -1; // Timestamp for next rotation
+
+
     public LobbyGroup(String name) {
         this.name = name;
 
@@ -81,5 +85,21 @@ public class LobbyGroup {
 
     public void setCurrentLobby(Lobby currentLobby) {
         this.currentLobby = currentLobby;
+    }
+
+    public TimeUnits getLobbyRotationTimeUnit() {
+        return lobbyRotationTimeUnit;
+    }
+
+    public void setLobbyRotationTimeUnit(TimeUnits lobbyRotationTimeUnit) {
+        this.lobbyRotationTimeUnit = lobbyRotationTimeUnit;
+    }
+
+    public long getNextRotationTime() {
+        return nextRotationTime;
+    }
+
+    public void setNextRotationTime(long nextRotationTime) {
+        this.nextRotationTime = nextRotationTime;
     }
 }

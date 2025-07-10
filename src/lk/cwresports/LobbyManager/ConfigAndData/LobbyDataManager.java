@@ -72,6 +72,11 @@ public class LobbyDataManager {
                 if (group.getCurrentLobby() != null) {
                     groupSection.set("current_lobby", group.getCurrentLobby().getWorld().getName());
                 }
+
+                groupSection.set("rotation_time_unit", group.getLobbyRotationTimeUnit().name());
+                if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL) {
+                    groupSection.set("next_rotation_time", group.getNextRotationTime());
+                }
             }
 
             // Save default selected lobby
@@ -167,6 +172,18 @@ public class LobbyDataManager {
                 }
 
                 lobbyManager.registerLobbyGroup(group);
+
+                String rotationUnit = groupSection.getString("rotation_time_unit");
+                if (rotationUnit != null) {
+                    try {
+                        group.setLobbyRotationTimeUnit(TimeUnits.valueOf(rotationUnit));
+                        if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL) {
+                            group.setNextRotationTime(groupSection.getLong("next_rotation_time", -1));
+                        }
+                    } catch (IllegalArgumentException e) {
+                        plugin.getLogger().warning("Invalid rotation unit for group " + groupName);
+                    }
+                }
             }
         }
 

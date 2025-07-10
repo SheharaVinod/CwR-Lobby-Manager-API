@@ -32,7 +32,7 @@ public class CwRLobbyAPI extends JavaPlugin {
 
         // load lobby manager;
         LobbyManager.getInstance().load();
-
+        LobbyManager.getInstance().startRotationScheduler();
 
         // commands
         getCommand(SpawnCommand.NAME).setExecutor(new SpawnCommand(this));
@@ -53,6 +53,7 @@ public class CwRLobbyAPI extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        LobbyManager.getInstance().stopRotationScheduler();
         LobbyManager.getInstance().save();
     }
 

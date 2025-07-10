@@ -3,6 +3,7 @@ package lk.cwresports.LobbyManager.Commands;
 import lk.cwresports.LobbyManager.API.*;
 import lk.cwresports.LobbyManager.ConfigAndData.LobbyDataManager;
 import lk.cwresports.LobbyManager.Utils.PermissionNodes;
+import lk.cwresports.LobbyManager.Utils.RotationCalculator;
 import lk.cwresports.LobbyManager.Utils.TextStrings;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -29,7 +30,10 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_remove_spawn_location_by_index = "remove_spawn_location_by_index";
 
     public static final String sub_set_spawn_cool_down = "set_spawn_cool_down";
-    public static final String sub_change_lobby_rotation = "change_lobby_rotation_type"; // TODO:
+
+    public static final String sub_change_lobby_rotation = "change_lobby_rotation_type";
+    public static final String sub_set_group_lobby_rotation_time = "set_group_lobby_rotation_time";
+    public static final String sub_rotate_every_lobby_group = "rotate_every_lobby_group";
 
     public static final String sub_change_lobby_spawn_rotation = "change_spawn_rotation_type";
     public static final String sub_change_group_of = "change_group_of";
@@ -55,7 +59,10 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_set_period,
             sub_help,
             sub_info,
-            sub_save
+            sub_save,
+            sub_change_lobby_rotation,
+            sub_set_group_lobby_rotation_time,
+            sub_rotate_every_lobby_group
     };
 
     Plugin plugin;
@@ -127,9 +134,86 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return remove_spawn_location_by_index(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_set_spawn_cool_down)) {
                 return set_spawn_cool_down(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_change_lobby_rotation)) {
+                return change_lobby_rotation(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_set_group_lobby_rotation_time)) {
+                return set_group_lobby_rotation_time(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_rotate_every_lobby_group)) {
+                return rotate_every_lobby_group(admin, strings);
             }
         }
 
+        return true;
+    }
+
+
+    private boolean change_lobby_rotation(Player admin, String[] strings) {
+        if (strings.length < 3) {
+            admin.sendMessage("§cUsage: /lobby-manager change_lobby_rotation_type <RANDOM|CIRCULAR> <group>");
+            return true;
+        }
+
+        String type = strings[1].toUpperCase();
+        String groupName = strings[2];
+
+        try {
+            LobbyRotationTypes rotationType = LobbyRotationTypes.valueOf(type);
+            LobbyGroup group = LobbyManager.getInstance().getLobbyGroup(groupName);
+
+            if (group == null) {
+                admin.sendMessage("§cGroup not found!");
+                return true;
+            }
+
+            group.setLobbyRotationType(rotationType.name());
+            admin.sendMessage("§aRotation type set to " + type);
+        } catch (IllegalArgumentException e) {
+            admin.sendMessage("§cInvalid rotation type! Use RANDOM or CIRCULAR");
+        }
+        return true;
+    }
+
+    private boolean set_group_lobby_rotation_time(Player admin, String[] strings) {
+        if (strings.length < 3) {
+            admin.sendMessage("§cUsage: /lobby-manager set_group_lobby_rotation_time <group> <TimeUnit>");
+            return true;
+        }
+
+        String groupName = strings[1];
+        String timeUnit = strings[2].toUpperCase();
+
+        try {
+            TimeUnits unit = TimeUnits.valueOf(timeUnit);
+            LobbyGroup group = LobbyManager.getInstance().getLobbyGroup(groupName);
+
+            if (group == null) {
+                admin.sendMessage("§cGroup not found!");
+                return true;
+            }
+
+            group.setLobbyRotationTimeUnit(unit);
+            if (unit != TimeUnits.MANUAL) {
+                group.setNextRotationTime(RotationCalculator.calculateNextRotation(unit));
+            }
+            admin.sendMessage("§aRotation time unit set to " + timeUnit);
+        } catch (IllegalArgumentException e) {
+            admin.sendMessage("§cInvalid time unit! Use MINUTE, HOUR, DAY, WEEK, MONTH, or MANUAL");
+        }
+        return true;
+    }
+
+    private boolean rotate_every_lobby_group(Player admin, String[] strings) {
+        for (LobbyGroup group : LobbyManager.getInstance().lobbyGroupMap.values()) {
+            if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL) {
+                group.changeCurrentLobby();
+                if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL) {
+                    group.setNextRotationTime(RotationCalculator.calculateNextRotation(
+                            group.getLobbyRotationTimeUnit()
+                    ));
+                }
+            }
+        }
+        admin.sendMessage("§aAll groups rotated!");
         return true;
     }
 

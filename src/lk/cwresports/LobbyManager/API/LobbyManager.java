@@ -3,9 +3,11 @@ package lk.cwresports.LobbyManager.API;
 import lk.cwresports.LobbyManager.ConfigAndData.LobbyDataManager;
 import lk.cwresports.LobbyManager.CwRLobbyAPI;
 import lk.cwresports.LobbyManager.Utils.PermissionNodes;
+import lk.cwresports.LobbyManager.Utils.RotationCalculator;
 import lk.cwresports.LobbyManager.Utils.TextStrings;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -19,6 +21,8 @@ public class LobbyManager {
     private static final Set<Player> spawnBlockedPlayers = new HashSet<>();
     private static final List<EventLobbies> eventLobbies = new ArrayList<>();
 
+    private BukkitTask rotationTask;
+
 
     public LobbyManager() {
         plugin = CwRLobbyAPI.getPlugin();
@@ -27,6 +31,32 @@ public class LobbyManager {
         // getDefaultGroup();
     }
 
+
+    public void startRotationScheduler() {
+        rotationTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            long now = System.currentTimeMillis();
+            for (LobbyGroup group : lobbyGroupMap.values()) {
+                if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL &&
+                        group.getNextRotationTime() > 0 &&
+                        now >= group.getNextRotationTime()) {
+
+                    group.changeCurrentLobby();
+                    group.setNextRotationTime(
+                            RotationCalculator.calculateNextRotation(
+                                    group.getLobbyRotationTimeUnit()
+                            )
+                    );
+                }
+            }
+        }, 0L, 20L * 30); // Check every 30 seconds
+    }
+
+    public void stopRotationScheduler() {
+        if (rotationTask != null) {
+            rotationTask.cancel();
+        }
+    }
+    
     public void registerNameFor(Lobby lobby) {
         String name = lobby.getWorld().getName();
         lobbyNameMap.put(name, lobby);
