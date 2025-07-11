@@ -30,6 +30,11 @@ public class LobbyGroup {
     }
 
     public void changeCurrentLobby() {
+        if (lobbies.isEmpty()) {
+            currentLobby = null;
+            return;
+        }
+
         // lobby change functionalities.
         if (lobbies.size() == 1) {
             this.currentLobby = lobbies.get(0);

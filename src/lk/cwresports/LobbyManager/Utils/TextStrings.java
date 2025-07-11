@@ -9,6 +9,11 @@ public class TextStrings {
 
     public static String ONLY_PLAYERS_CAN_EXECUTE_THIS_COMMAND = "&6Only players can execute this command.";
 
+    public static final String EVENT_LOBBY_INFO_HEADER = "&6&lEvent Lobbies Information:";
+    public static final String NO_EVENT_LOBBIES = "&cNo event lobbies found!";
+    public static final String EVENT_NOT_SET = "&cEvent period not set";
+    public static final String INVALID_DATE_FORMAT = "&cInvalid date format";
+
     public static String YOU_CANT_CREATE_DEFAULT_GROUP = "&4You are not able to create a new default group.!";
     public static String YOU_CANT_CREATE_BLANK_GROUP = "&4You are not able to create a anonymous group.!";
     public static String GROUP_CREATED_SUCCESSFULLY = "&6Group created successfully.";

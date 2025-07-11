@@ -14,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class LobbyManagerCommand implements CommandExecutor {
@@ -35,6 +36,7 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_set_group_lobby_rotation_time = "set_group_lobby_rotation_time";
     public static final String sub_rotate_every_lobby_group = "rotate_every_lobby_group";
     public static final String sub_info_of_all_groups = "info_of_all_groups";
+    public static final String sub_info_of_all_event_lobbies = "info_of_all_event_lobbies";
 
     public static final String sub_change_lobby_spawn_rotation = "change_spawn_rotation_type";
     public static final String sub_change_group_of = "change_group_of";
@@ -64,6 +66,7 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_change_lobby_rotation,
             sub_set_group_lobby_rotation_time,
             sub_rotate_every_lobby_group,
+            sub_info_of_all_event_lobbies,
             sub_info_of_all_groups
     };
 
@@ -144,9 +147,46 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return rotate_every_lobby_group(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_info_of_all_groups)) {
                 return info_of_all_groups(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_info_of_all_event_lobbies)) {
+                return info_of_all_event_lobbies(admin, strings);
             }
         }
 
+        return true;
+    }
+
+    public boolean info_of_all_event_lobbies(Player admin, String[] strings) {
+        List<EventLobbies> eventLobbies = LobbyManager.getInstance().getEventLobbies();
+
+        if (eventLobbies.isEmpty()) {
+            admin.sendMessage("§cNo event lobbies found!");
+            return true;
+        }
+
+        admin.sendMessage("§6§lEvent Lobbies Information:");
+        admin.sendMessage("§7----------------------------");
+
+        for (EventLobbies eventLobby : eventLobbies) {
+            String worldName = eventLobby.getWorld().getName();
+            String eventDate = eventLobby.getEventDate();
+            int expireDays = eventLobby.getExpireDays();
+            String timeZone = eventLobby.getTimeZone();
+
+            if (eventDate == null || timeZone == null) {
+                admin.sendMessage("§e" + worldName + "§7: §cEvent period not set");
+            } else {
+                String[] parts = eventDate.split("-");
+                if (parts.length >= 2) {
+                    String month = parts[0];
+                    String day = parts[1];
+                    admin.sendMessage("§e" + worldName + "§7 - " + month + "/" + day + " - " + expireDays + " days");
+                } else {
+                    admin.sendMessage("§e" + worldName + "§7: §cInvalid date format");
+                }
+            }
+        }
+
+        admin.sendMessage("§7----------------------------");
         return true;
     }
 
@@ -169,7 +209,7 @@ public class LobbyManagerCommand implements CommandExecutor {
                 info.append("§cNo lobbies");
             } else {
                 for (Lobby lobby : group.getLobbies()) {
-                    String currentIndicator = (lobby == group.getCurrentLobby()) ? "§a➤" : "";
+                    String currentIndicator = (lobby == group.getCurrentLobby()) ? "§a" : "";
                     info.append(currentIndicator).append(lobby.getWorld().getName()).append("§7, ");
                 }
                 // Remove last comma
@@ -248,6 +288,10 @@ public class LobbyManagerCommand implements CommandExecutor {
 
     private boolean rotate_every_lobby_group(Player admin, String[] strings) {
         for (LobbyGroup group : LobbyManager.getInstance().lobbyGroupMap.values()) {
+            if (group.getLobbies().isEmpty()) {
+                continue;
+            }
+
             // Remove manual check to force rotation
             group.changeCurrentLobby();
             if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL) {

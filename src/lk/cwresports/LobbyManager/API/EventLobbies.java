@@ -58,4 +58,16 @@ public class EventLobbies extends Lobby {
             return true;
         }
     }
+
+    public String getEventDate() {
+        return eventDate;
+    }
+
+    public int getExpireDays() {
+        return expireDays;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
 }

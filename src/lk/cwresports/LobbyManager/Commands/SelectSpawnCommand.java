@@ -32,6 +32,7 @@ public class SelectSpawnCommand implements CommandExecutor {
 
         if (groupName.equalsIgnoreCase("default")) {
             playerDataManager.deleteFileOf(player);
+            player.sendMessage(TextStrings.colorize("&aSelected group: " + groupName, false));
             return true;
         }
 
@@ -50,7 +51,7 @@ public class SelectSpawnCommand implements CommandExecutor {
 
         // Save selection to player data
         playerDataManager.setAndSave(player, "selected-group", groupName);
-        player.sendMessage(TextStrings.colorize("&aSelected group: " + groupName));
+        player.sendMessage(TextStrings.colorize("&aSelected group: " + groupName, false));
         return true;
     }
 }
