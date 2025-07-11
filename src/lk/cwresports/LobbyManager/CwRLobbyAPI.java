@@ -10,7 +10,6 @@ import lk.cwresports.LobbyManager.Events.PlayerLeaveListener;
 import lk.cwresports.LobbyManager.Tabs.LobbyManagerTab;
 import lk.cwresports.LobbyManager.Tabs.SelectSpawnTab;
 import lk.cwresports.LobbyManager.Utils.RotationCalculator;
-import lk.cwresports.LobbyManager.Utils.TimeZoneHelper;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CwRLobbyAPI extends JavaPlugin {
@@ -31,8 +30,6 @@ public class CwRLobbyAPI extends JavaPlugin {
         playerData = new PlayerDataManager(this);
         RotationCalculator.init(this);
 
-        // Load timezone data
-        TimeZoneHelper.load(this);
 
         // load lobby manager;
         LobbyManager.getInstance().load();

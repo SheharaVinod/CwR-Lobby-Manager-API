@@ -170,16 +170,17 @@ public class LobbyManagerCommand implements CommandExecutor {
             String worldName = eventLobby.getWorld().getName();
             String eventDate = eventLobby.getEventDate();
             int expireDays = eventLobby.getExpireDays();
-            String timeZone = eventLobby.getTimeZone();
 
-            if (eventDate == null || timeZone == null) {
+            if (eventDate == null) {
                 admin.sendMessage("§e" + worldName + "§7: §cEvent period not set");
             } else {
                 String[] parts = eventDate.split("-");
                 if (parts.length >= 2) {
                     String month = parts[0];
                     String day = parts[1];
-                    admin.sendMessage("§e" + worldName + "§7 - " + month + "/" + day + " - " + expireDays + " days");
+                    String hour = parts.length > 2 ? parts[2] : "00";
+                    String minute = parts.length > 3 ? parts[3] : "00";
+                    admin.sendMessage("§e" + worldName + "§7 - " + month + "/" + day + " " + hour + ":" + minute + " - " + expireDays + " days");
                 } else {
                     admin.sendMessage("§e" + worldName + "§7: §cInvalid date format");
                 }
@@ -307,28 +308,29 @@ public class LobbyManagerCommand implements CommandExecutor {
     }
 
     public boolean set_period(Player admin, String[] strings) {
-        if (strings.length < 4) {
-            admin.sendMessage("§cUsage: /lobby-manager set_period <MM-DD-HH-mm-ss> <days> <timezone>");
+        if (strings.length < 3) {
+            admin.sendMessage("§cUsage: /lobby-manager set_period <MM-DD-HH-mm-ss> <days>");
             return true;
         }
 
         try {
             String date = strings[1];
             int expireDays = Integer.parseInt(strings[2].replace("d", ""));
-            String timezone = strings[3];
 
             // Validate lobby type
-            //? wrong...
             Lobby lobby = LobbyManager.getInstance().getLobbyByName(admin.getWorld().getName());
             if (!(lobby instanceof EventLobbies)) {
                 admin.sendMessage("§cYou must be in an event lobby!");
                 return true;
             }
 
-            ((EventLobbies) lobby).setPeriod(date, expireDays, timezone);
+            ((EventLobbies) lobby).setPeriod(date, expireDays);
             admin.sendMessage("§aEvent period set successfully!");
+        } catch (IllegalArgumentException e) {
+            admin.sendMessage("§cInvalid arguments! Format: MM-DD-HH-mm-ss days");
+            admin.sendMessage("§cError: " + e.getMessage());
         } catch (Exception e) {
-            admin.sendMessage("§cInvalid arguments! Format: MM-DD-HH-mm-ss days timezone");
+            admin.sendMessage("§cAn error occurred while setting the event period");
         }
         return true;
     }

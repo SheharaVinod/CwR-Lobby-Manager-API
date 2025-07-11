@@ -1,6 +1,6 @@
 package lk.cwresports.LobbyManager.API;
 
-import lk.cwresports.LobbyManager.Utils.TimeZoneHelper;
+import lk.cwresports.LobbyManager.CwRLobbyAPI;
 import org.bukkit.Location;
 
 import java.util.Calendar;
@@ -8,11 +8,11 @@ import java.util.Calendar;
 public class EventLobbies extends Lobby {
     private String eventDate;
     private int expireDays;
-    private String timeZone;
+    private long eventStartMillis = -1;
+    private long eventEndMillis = -1;
 
     public EventLobbies(Location currentLocation) {
         super(currentLocation);
-
         LobbyManager.getInstance().getEventLobbies().add(this);
     }
 
@@ -21,14 +21,9 @@ public class EventLobbies extends Lobby {
         return true;
     }
 
-    public void setPeriod(String eventDate, int expireDays, String timeZone) {
+    public void setPeriod(String eventDate, int expireDays) {
         this.eventDate = eventDate;
         this.expireDays = expireDays;
-        this.timeZone = timeZone;
-    }
-
-    public boolean isEvent() {
-        if (eventDate == null || timeZone == null) return true;
 
         try {
             String[] parts = eventDate.split("-");
@@ -38,8 +33,8 @@ public class EventLobbies extends Lobby {
             int minute = Integer.parseInt(parts[3]);
             int second = Integer.parseInt(parts[4]);
 
-            double offset = TimeZoneHelper.getOffsetForAbbr(timeZone);
-            long offsetMillis = (long) (offset * 3600000);
+            double timeOffsetHours = CwRLobbyAPI.getPlugin().getConfig().getDouble("time-offset", 5.5);
+            long offsetMillis = (long) (timeOffsetHours * 3600000);
 
             Calendar eventStart = Calendar.getInstance();
             eventStart.set(Calendar.MONTH, month);
@@ -49,14 +44,22 @@ public class EventLobbies extends Lobby {
             eventStart.set(Calendar.SECOND, second);
             eventStart.set(Calendar.MILLISECOND, 0);
 
-            long eventStartMillis = eventStart.getTimeInMillis() - offsetMillis;
-            long eventEndMillis = eventStartMillis + (expireDays * 86400000L);
-            long currentTime = System.currentTimeMillis();
-
-            return currentTime >= eventStartMillis && currentTime < eventEndMillis;
+            this.eventStartMillis = eventStart.getTimeInMillis() - offsetMillis;
+            this.eventEndMillis = eventStartMillis + (expireDays * 86400000L);
         } catch (Exception e) {
-            return true;
+            this.eventStartMillis = -1;
+            this.eventEndMillis = -1;
+            throw new IllegalArgumentException("Invalid date format or values");
         }
+    }
+
+    public boolean isEvent() {
+        if (eventStartMillis == -1 || eventEndMillis == -1) {
+            return false;
+        }
+
+        long currentTime = System.currentTimeMillis();
+        return currentTime >= eventStartMillis && currentTime < eventEndMillis;
     }
 
     public String getEventDate() {
@@ -65,9 +68,5 @@ public class EventLobbies extends Lobby {
 
     public int getExpireDays() {
         return expireDays;
-    }
-
-    public String getTimeZone() {
-        return timeZone;
     }
 }

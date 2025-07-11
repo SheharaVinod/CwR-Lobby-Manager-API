@@ -3,13 +3,11 @@ package lk.cwresports.LobbyManager.Tabs;
 import lk.cwresports.LobbyManager.API.LobbyManager;
 import lk.cwresports.LobbyManager.API.TimeUnits;
 import lk.cwresports.LobbyManager.Commands.LobbyManagerCommand;
-import lk.cwresports.LobbyManager.Utils.TimeZoneHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,8 +53,6 @@ public class LobbyManagerTab implements TabCompleter {
                     return List.of("<MM-DD-HH-mm-ss>");
                 } else if (strings.length == 3) {
                     return List.of("1", "2", "4", "5", "6", "7");
-                } else if (strings.length == 4) {
-                    return TimeZoneHelper.getZones();
                 }
 
             }

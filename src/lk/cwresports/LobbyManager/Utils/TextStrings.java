@@ -31,8 +31,8 @@ public class TextStrings {
     public static String YOU_ARE_NOT_IN_ADMIN_MOD = "&4You are not in admin mod to use this command.!";
 
     public static String YOU_DONT_HAVE_PERMISSION = "&4You don't have permission.!";
-				
-    public static String[] HELP = 	{
+
+    public static final String[] HELP = 	{
             "&bYou can create lobby group using",
             "",
             "&6/lobby-manager create_group <name>",
@@ -41,7 +41,7 @@ public class TextStrings {
             "&6/lobby-manager delete_lobby",
             "&6/lobby-manager save",
             "&6/lobby-manager create_event_lobby",
-            "&6/lobby-manager set_period <MM-DD-HH-mm-ss> <days> <timezone>",
+            "&6/lobby-manager set_period <MM-DD-HH-mm-ss> <days>",
             "&6/lobby-manager change_lobby_spawn_rotation default",
             "&6/lobby-manager change_group_of <lobby_name> <group_name>",
             "&6/lobby-manager change_group_of <lobby_name> <group_name>",
