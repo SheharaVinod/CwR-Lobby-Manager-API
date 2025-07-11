@@ -19,4 +19,11 @@ auto-rotate-lobbies-every: MANUAL
 
 time-offset: 5.5
 
+# SQL Support
+use-sql: false
+sql-host: localhost # database URL
+sql-port: 3306
+sql-database: lobby_player_db # database name
+sql-username: user
+sql-password: pass
 

@@ -58,6 +58,7 @@ public class CwRLobbyAPI extends JavaPlugin {
     public void onDisable() {
         LobbyManager.getInstance().stopRotationScheduler();
         LobbyManager.getInstance().save();
+        getPlayerDataManager().close();
     }
 
     public static CwRLobbyAPI getPlugin() {

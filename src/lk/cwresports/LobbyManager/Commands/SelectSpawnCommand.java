@@ -9,7 +9,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class SelectSpawnCommand implements CommandExecutor {
+
     public static final String NAME = "select-spawn";
+
     private final PlayerDataManager playerDataManager;
 
     public SelectSpawnCommand(PlayerDataManager playerDataManager) {
@@ -31,7 +33,7 @@ public class SelectSpawnCommand implements CommandExecutor {
         String groupName = args[0].toLowerCase();
 
         if (groupName.equalsIgnoreCase("default")) {
-            playerDataManager.deleteFileOf(player);
+            playerDataManager.deleteFileOf(player); // This will delete SQL row or file
             player.sendMessage(TextStrings.colorize("&aSelected group: " + groupName, false));
             return true;
         }
