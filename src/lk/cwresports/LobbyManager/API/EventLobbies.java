@@ -1,8 +1,6 @@
 package lk.cwresports.LobbyManager.API;
 
-import lk.cwresports.LobbyManager.CwRLobbyAPI;
 import org.bukkit.Location;
-
 import java.util.Calendar;
 
 public class EventLobbies extends Lobby {
@@ -24,18 +22,15 @@ public class EventLobbies extends Lobby {
     public void setPeriod(String eventDate, int expireDays) {
         this.eventDate = eventDate;
         this.expireDays = expireDays;
-
         try {
             String[] parts = eventDate.split("-");
-            int month = Integer.parseInt(parts[0]) - 1; // calendar uses 0 based months
+            int month = Integer.parseInt(parts[0]) - 1;
             int day = Integer.parseInt(parts[1]);
             int hour = Integer.parseInt(parts[2]);
             int minute = Integer.parseInt(parts[3]);
             int second = Integer.parseInt(parts[4]);
-
-            double timeOffsetHours = CwRLobbyAPI.getPlugin().getConfig().getDouble("time-offset", 5.5);
+            double timeOffsetHours = 5.5; // or load from config
             long offsetMillis = (long) (timeOffsetHours * 3600000);
-
             Calendar eventStart = Calendar.getInstance();
             eventStart.set(Calendar.MONTH, month);
             eventStart.set(Calendar.DAY_OF_MONTH, day);
@@ -43,7 +38,6 @@ public class EventLobbies extends Lobby {
             eventStart.set(Calendar.MINUTE, minute);
             eventStart.set(Calendar.SECOND, second);
             eventStart.set(Calendar.MILLISECOND, 0);
-
             this.eventStartMillis = eventStart.getTimeInMillis() - offsetMillis;
             this.eventEndMillis = eventStartMillis + (expireDays * 86400000L);
         } catch (Exception e) {
@@ -54,19 +48,11 @@ public class EventLobbies extends Lobby {
     }
 
     public boolean isEvent() {
-        if (eventStartMillis == -1 || eventEndMillis == -1) {
-            return false;
-        }
-
+        if (eventStartMillis == -1 || eventEndMillis == -1) return false;
         long currentTime = System.currentTimeMillis();
         return currentTime >= eventStartMillis && currentTime < eventEndMillis;
     }
 
-    public String getEventDate() {
-        return eventDate;
-    }
-
-    public int getExpireDays() {
-        return expireDays;
-    }
+    public String getEventDate() { return eventDate; }
+    public int getExpireDays() { return expireDays; }
 }

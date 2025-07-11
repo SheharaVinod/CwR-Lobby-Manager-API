@@ -15,6 +15,7 @@ public class LobbyManager {
     private static LobbyManager manager;
     public Map<String, LobbyGroup> lobbyGroupMap = new HashMap<>();
     public Map<String, Lobby> lobbyNameMap = new HashMap<>();
+    public boolean isLoading = false;
 
     public Lobby defaultSelectedLobby;
     private final CwRLobbyAPI plugin;
@@ -56,7 +57,7 @@ public class LobbyManager {
             rotationTask.cancel();
         }
     }
-    
+
     public void registerNameFor(Lobby lobby) {
         String name = lobby.getWorld().getName();
         lobbyNameMap.put(name, lobby);

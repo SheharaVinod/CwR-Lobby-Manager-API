@@ -479,8 +479,8 @@ public class LobbyManagerCommand implements CommandExecutor {
             return true;
         }
 
-        String lobby_name = strings[2];
-        String group_name = strings[3];
+        String lobby_name = strings[1];  // Changed from strings[2]
+        String group_name = strings[2];  // Changed from strings[3]
 
         LobbyManager.getInstance().change_group_of(lobby_name, group_name, admin);
         admin.sendMessage(TextStrings.colorize(TextStrings.SUCCESSFUL));
