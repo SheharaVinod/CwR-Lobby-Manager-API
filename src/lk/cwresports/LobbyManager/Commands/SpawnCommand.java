@@ -53,7 +53,7 @@ public class SpawnCommand implements CommandExecutor {
             player.setVelocity(new Vector(0, 0, 0));
 
             if (player.hasPermission("cwr-core.lobby-manager.admin")) {
-                if (plugin.getConfig().getBoolean("should-afk-admins-for-teleport", true)) {
+                if (!plugin.getConfig().getBoolean("should-afk-admins-for-teleport", false)) {
                     sendToLobby(player);
                     return true;
                 }

@@ -18,7 +18,7 @@ import java.util.UUID;
 public class LobbyDataManager {
     private final JavaPlugin plugin;
     private final LobbyManager lobbyManager;
-    private File dataFile;
+    private final File dataFile;
 
     public LobbyDataManager(JavaPlugin plugin) {
         this.plugin = plugin;
