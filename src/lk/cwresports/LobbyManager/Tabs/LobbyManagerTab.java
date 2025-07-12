@@ -3,6 +3,7 @@ package lk.cwresports.LobbyManager.Tabs;
 import lk.cwresports.LobbyManager.API.LobbyManager;
 import lk.cwresports.LobbyManager.API.TimeUnits;
 import lk.cwresports.LobbyManager.Commands.LobbyManagerCommand;
+import lk.cwresports.LobbyManager.Utils.TabSorter;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,7 +24,7 @@ public class LobbyManagerTab implements TabCompleter {
 
         if (strings.length == 1) {
             // First argument: list all subcommands
-            return Arrays.asList(LobbyManagerCommand.subs);
+            return TabSorter.sort(Arrays.asList(LobbyManagerCommand.subs), strings[0]);
         }
 
         if (strings.length > 1) {
@@ -41,7 +42,7 @@ public class LobbyManagerTab implements TabCompleter {
                 if (strings.length == 2) {
                     return LobbyManager.getInstance().getGroupedLobbies();
                 } else if (strings.length == 3) {
-                    return LobbyManager.getInstance().getGroups();
+                    return TabSorter.sort(LobbyManager.getInstance().getGroups(), strings[1], true);
                 }
 
             } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_remove_spawn_location_by_index)) {
@@ -85,23 +86,23 @@ public class LobbyManagerTab implements TabCompleter {
                     return Arrays.asList("RANDOM", "CIRCULAR");
                 } else if (strings.length == 3) {
                     // Suggest group names
-                    return LobbyManager.getInstance().getGroups();
+                    return TabSorter.sort(LobbyManager.getInstance().getGroups(), strings[1], true);
                 }
 
             } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_set_group_lobby_rotation_time)) {
                 if (strings.length == 2) {
                     // Suggest group names
-                    return LobbyManager.getInstance().getGroups();
+                    return TabSorter.sort(LobbyManager.getInstance().getGroups(), strings[1], true);
                 } else if (strings.length == 3) {
                     // Suggest time units
-                    return Arrays.asList(
+                    return TabSorter.sort(Arrays.asList(
                             TimeUnits.MINUTE.name(),
                             TimeUnits.HOUR.name(),
                             TimeUnits.DAY.name(),
                             TimeUnits.WEEK.name(),
                             TimeUnits.MONTH.name(),
                             TimeUnits.MANUAL.name()
-                    );
+                    ), strings[2], true);
                 }
             }
         }

@@ -32,20 +32,50 @@ public class TextStrings {
 
     public static String YOU_DONT_HAVE_PERMISSION = "&4You don't have permission.!";
 
-    public static final String[] HELP = 	{
-            "&bYou can create lobby group using",
+    public static final String[] HELP = {
+            "&6&l=== Lobby Manager Commands ===",
+            "&7Group Management:",
+            "&6/lobby-manager create_group <name> &7- Create a new lobby group",
+            "&6/lobby-manager delete_group <name> &7- Delete a lobby group",
+            "&6/lobby-manager change_group_of <lobby> <group> &7- Move lobby to another group",
             "",
-            "&6/lobby-manager create_group <name>",
-            "&6/lobby-manager delete_group name",
-            "&6/lobby-manager create_lobby",
-            "&6/lobby-manager delete_lobby",
-            "&6/lobby-manager save",
-            "&6/lobby-manager create_event_lobby",
-            "&6/lobby-manager set_period <MM-DD-HH-mm-ss> <days>",
-            "&6/lobby-manager change_lobby_spawn_rotation default",
-            "&6/lobby-manager change_group_of <lobby_name> <group_name>",
-            "&6/lobby-manager change_group_of <lobby_name> <group_name>",
-            ""
+            "&7Lobby Creation:",
+            "&6/lobby-manager create_lobby &7- Create regular lobby at your location",
+            "&6/lobby-manager create_event_lobby &7- Create event lobby at your location",
+            "&6/lobby-manager delete_lobby &7- Delete current lobby",
+            "",
+            "&7Spawn Points:",
+            "&6/lobby-manager add_a_new_spawn &7- Add spawn point at your location",
+            "&6/lobby-manager set_default_spawn &7- Set current location as default spawn",
+            "&6/lobby-manager remove_spawn_location_by_index <index> &7- Remove spawn point",
+            "&6/lobby-manager change_lobby_spawn_rotation <DEFAULT|RANDOM|CIRCULAR> &7- Set spawn rotation",
+            "&6/lobby-manager set_spawn_cool_down <seconds> &7- Set spawn command cooldown",
+            "",
+            "&7Group Rotation:",
+            "&6/lobby-manager change_lobby_rotation <RANDOM|CIRCULAR> <group> &7- Set rotation type",
+            "&6/lobby-manager set_group_lobby_rotation_time <group> <MINUTE|HOUR|DAY|WEEK|MONTH|MANUAL> &7- Set rotation schedule",
+            "&6/lobby-manager rotate_every_lobby_group &7- Force rotate all groups now",
+            "",
+            "&7Event Management:",
+            "&6/lobby-manager set_period <MM-DD-HH-mm-ss|DD-HH-mm-ss> <days|DD-HH-mm-ss> &7- Set event period",
+            "&6/lobby-manager info_of_all_event_lobbies &7- List all event lobbies",
+            "",
+            "&7Lobby Settings:",
+            "&6/lobby-manager disabled_hunger <true|false> &7- Toggle hunger in lobby",
+            "&6/lobby-manager disabled_damage <true|false> &7- Toggle damage in lobby",
+            "&6/lobby-manager set_game_mod <GAMEMODE> &7- Set lobby game mode",
+            "&6/lobby-manager cansel_player_interaction <true|false> &7- Toggle block interactions",
+            "",
+            "&7Information:",
+            "&6/lobby-manager info &7- Show current lobby info",
+            "&6/lobby-manager info_of_all_groups &7- List all groups and lobbies",
+            "&6/lobby-manager help &7- Show this help",
+            "",
+            "&7System:",
+            "&6/lobby-manager admin &7- Toggle admin mode",
+            "&6/lobby-manager save &7- Save all lobby data",
+            "",
+            "&6&l================================="
     };
 				
     public static String colorize(String massage) {
@@ -58,4 +88,6 @@ public class TextStrings {
         }
         return ChatColor.translateAlternateColorCodes('&', massage);
     }
+
+
 }

@@ -110,6 +110,10 @@ public class LobbyManagerCommand implements CommandExecutor {
         if (!(strings.length > 0)) {
             return help(admin, strings);
         } else {
+            if (strings[0].equalsIgnoreCase(sub_help)) {
+                return help(admin, strings);
+            }
+
             if (strings[0].equalsIgnoreCase(sub_admin)) {
                 return admin(admin, strings);
             }
@@ -121,8 +125,6 @@ public class LobbyManagerCommand implements CommandExecutor {
 
             if (strings[0].equalsIgnoreCase(sub_save)) {
                 return save(admin, strings);
-            } else if (strings[0].equalsIgnoreCase(sub_help)) {
-                return help(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_create_lobby)) {
                 return create_lobby(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_create_event_lobby)) {
@@ -721,8 +723,8 @@ public class LobbyManagerCommand implements CommandExecutor {
             return true;
         }
 
-        String lobby_name = strings[1];  // Changed from strings[2]
-        String group_name = strings[2];  // Changed from strings[3]
+        String lobby_name = strings[1];
+        String group_name = strings[2];
 
         LobbyManager.getInstance().change_group_of(lobby_name, group_name, admin);
         admin.sendMessage(TextStrings.colorize(TextStrings.SUCCESSFUL));

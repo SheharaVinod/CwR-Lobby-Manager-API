@@ -21,12 +21,12 @@ public class SelectSpawnCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(TextStrings.colorize(TextStrings.ONLY_PLAYERS_CAN_EXECUTE_THIS_COMMAND));
+            sender.sendMessage(TextStrings.colorize(TextStrings.ONLY_PLAYERS_CAN_EXECUTE_THIS_COMMAND, false));
             return true;
         }
 
         if (args.length != 1) {
-            player.sendMessage(TextStrings.colorize("&cUsage: /select-spawn <group>"));
+            player.sendMessage(TextStrings.colorize("&cUsage: /select-spawn <group>", false));
             return true;
         }
 
@@ -40,14 +40,14 @@ public class SelectSpawnCommand implements CommandExecutor {
 
         // Check if group exists
         if (!LobbyManager.getInstance().getGroups().contains(groupName)) {
-            player.sendMessage(TextStrings.colorize("&cGroup not found!"));
+            player.sendMessage(TextStrings.colorize("&cGroup not found!", false));
             return true;
         }
 
         // Check permission for the specific group
         String permission = "cwr-core.lobby-manager.spawn." + groupName;
         if (!player.hasPermission(permission)) {
-            player.sendMessage(TextStrings.colorize("&cYou don't have permission to select this group!"));
+            player.sendMessage(TextStrings.colorize("&cYou don't have permission to select this group!", false));
             return true;
         }
 
