@@ -51,6 +51,9 @@ public class LobbyDataManager {
 
                 // Save location type
                 lobbySection.set("location_type", lobby.getLocationTypes().name());
+                // Save hunger and damage settings
+                lobbySection.set("disabled_hunger", lobby.isDisabledHunger());
+                lobbySection.set("disabled_damage", lobby.isDisabledDamage());
 
                 // Save event lobby data
                 if (lobby instanceof EventLobbies event) {
@@ -165,6 +168,9 @@ public class LobbyDataManager {
                     lobby.setLocationTypes(NextLocationTypes.valueOf(
                             lobbySection.getString("location_type", "DEFAULT")));
                 }
+                lobby.setDisabledHunger(lobbySection.getBoolean("disabled_hunger", true));
+                lobby.setDisabledDamage(lobbySection.getBoolean("disabled_damage", true));
+
                 loadedLobbies.put(lobbyName, lobby);
                 lobbyManager.registerNameFor(lobby);
             }

@@ -14,7 +14,8 @@ should-afk-admins-for-teleport: false
 #    MONTH,
 #    MANUAL
 # this mean , when you set this value on any day. it counts from 1`st day of the month started.
-# mean , when you config the lobbies in the middle of the year like jul 9. it calculates and save started day as jul 1 00:00AM ,this is for better rotation.
+# mean , when you config the lobbies in the middle of the year like jul 9. it calculates and save started day as jul 1 00:00AM ,
+# this is for better rotation.
 auto-rotate-lobbies-every: MANUAL
 
 time-offset: 5.5
@@ -27,3 +28,8 @@ sql-database: lobby_player_db # database name
 sql-username: user
 sql-password: pass
 
+auto-teleport-back-to-spawn-when-y-level: -300 # when falling to void.
+
+# We can set game mod of every spawn lobby ,
+# by default it's null mean never change game mod when you teleport to the spawn.
+change-game-mod-of-admins-after-teleport-to-spawn: false # ignore if admin.

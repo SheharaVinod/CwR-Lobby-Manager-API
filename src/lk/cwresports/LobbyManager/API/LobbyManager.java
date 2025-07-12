@@ -6,6 +6,7 @@ import lk.cwresports.LobbyManager.Utils.PermissionNodes;
 import lk.cwresports.LobbyManager.Utils.RotationCalculator;
 import lk.cwresports.LobbyManager.Utils.TextStrings;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -16,6 +17,7 @@ public class LobbyManager {
     public Map<String, LobbyGroup> lobbyGroupMap = new HashMap<>();
     public Map<String, Lobby> lobbyNameMap = new HashMap<>();
     public boolean isLoading = false;
+    private Set<World> lobbyWorlds = new HashSet<>();
 
     public Lobby defaultSelectedLobby;
     private final CwRLobbyAPI plugin;
@@ -56,6 +58,14 @@ public class LobbyManager {
         if (rotationTask != null) {
             rotationTask.cancel();
         }
+    }
+
+    public void registerWorld(World world) {
+        this.lobbyWorlds.add(world);
+    }
+
+    public boolean isInALobby(Player player) {
+        return this.lobbyWorlds.contains(player.getWorld());
     }
 
     public void registerNameFor(Lobby lobby) {

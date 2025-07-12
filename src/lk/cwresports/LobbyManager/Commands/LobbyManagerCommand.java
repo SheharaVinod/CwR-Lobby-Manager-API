@@ -26,6 +26,9 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_create_event_lobby = "create_event_lobby";
     public static final String sub_delete_lobby = "delete_lobby";
 
+    public static final String sub_disabled_hunger = "disabled_hunger";
+    public static final String sub_disabled_damage = "disabled_damage";
+
     public static final String sub_add_a_new_spawn = "add_a_new_spawn";
     public static final String sub_set_default_spawn = "set_default_spawn";
     public static final String sub_remove_spawn_location_by_index = "remove_spawn_location_by_index";
@@ -65,7 +68,9 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_set_group_lobby_rotation_time,
             sub_rotate_every_lobby_group,
             sub_info_of_all_event_lobbies,
-            sub_info_of_all_groups
+            sub_info_of_all_groups,
+            sub_disabled_hunger,
+            sub_disabled_damage
     };
 
     Plugin plugin;
@@ -145,9 +150,61 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return info_of_all_groups(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_info_of_all_event_lobbies)) {
                 return info_of_all_event_lobbies(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_disabled_hunger)) {
+                return disabled_hunger(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_disabled_damage)) {
+                return disabled_damage(admin, strings);
             }
         }
 
+        return true;
+    }
+
+    public boolean disabled_hunger(Player admin, String[] strings) {
+        // /lobby-manager disabled_hunger true
+        if (strings.length < 2) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        try {
+            boolean value = Boolean.parseBoolean(strings[0]);
+            if (!LobbyManager.getInstance().isInALobby(admin)) {
+                admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+                return true;
+            }
+            String worldName = admin.getWorld().getName();
+            Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+
+            lobby.setDisabledHunger(value);
+
+        } catch (Exception e) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+
+        return true;
+    }
+
+    public boolean disabled_damage(Player admin, String[] strings) {
+        // /lobby-manager disabled_damage true
+        if (strings.length < 2) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        try {
+            boolean value = Boolean.parseBoolean(strings[0]);
+            if (!LobbyManager.getInstance().isInALobby(admin)) {
+                admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+                return true;
+            }
+            String worldName = admin.getWorld().getName();
+            Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+
+            lobby.setDisabledDamage(value);
+        } catch (Exception e) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
         return true;
     }
 

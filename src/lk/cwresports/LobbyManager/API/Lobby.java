@@ -14,16 +14,37 @@ public class Lobby {
     private final World world;
     private final List<Location> spawn_locations = new ArrayList<>();
     private Location defaultSpawnLocation;
-    private Location nextLocation;
+
     private NextLocationTypes locationTypes = NextLocationTypes.DEFAULT;
     private final Random random = new Random();
     private int currentSpawnIndex = 0; // Track current index for circular rotation
 
+    private boolean disabledHunger = true;
+    private boolean disabledDamage = true;
+
     public Lobby(Location currentLocation) {
         this.world = currentLocation.getWorld();
         this.defaultSpawnLocation = currentLocation;
-        this.nextLocation = currentLocation;
+
         this.spawn_locations.add(currentLocation); // Keep this line to ensure at least one spawn exists
+
+        LobbyManager.getInstance().registerWorld(this.world);
+    }
+
+    public void setDisabledHunger(boolean b) {
+        this.disabledHunger = b;
+    }
+
+    public void setDisabledDamage(boolean b) {
+        this.disabledDamage = b;
+    }
+
+    public boolean isDisabledHunger() {
+        return disabledHunger;
+    }
+
+    public boolean isDisabledDamage() {
+        return disabledDamage;
     }
 
     public void addSpawnLocation(Location location) {
@@ -60,6 +81,8 @@ public class Lobby {
 
     public void send(Player player) {
         player.teleport(getNextLocation());
+
+
     }
 
     private Location getNextLocation() {
@@ -72,7 +95,6 @@ public class Lobby {
         } else if (this.locationTypes == NextLocationTypes.RANDOM) {
             return spawn_locations.get(random.nextInt(spawn_locations.size()));
         } else if (this.locationTypes == NextLocationTypes.CIRCULAR) {
-            // Circular rotation logic
             currentSpawnIndex = (currentSpawnIndex + 1) % spawn_locations.size();
             return spawn_locations.get(currentSpawnIndex);
         }

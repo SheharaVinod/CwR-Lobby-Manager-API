@@ -55,6 +55,14 @@ public class LobbyManagerTab implements TabCompleter {
                     return List.of("<DD-HH-mm-ss>");
                 }
 
+            } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_disabled_hunger)) {
+                if (strings.length == 2) {
+                    return List.of("true", "false");
+                }
+            } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_disabled_damage)) {
+                if (strings.length == 2) {
+                    return List.of("true", "false");
+                }
             }
             // Add tab completion for new commands
             else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_change_lobby_rotation)) {

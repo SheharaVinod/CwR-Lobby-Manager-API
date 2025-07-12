@@ -5,8 +5,7 @@ import lk.cwresports.LobbyManager.Commands.LobbyManagerCommand;
 import lk.cwresports.LobbyManager.Commands.SelectSpawnCommand;
 import lk.cwresports.LobbyManager.Commands.SpawnCommand;
 import lk.cwresports.LobbyManager.ConfigAndData.PlayerDataManager;
-import lk.cwresports.LobbyManager.Events.PlayerJoinToServer;
-import lk.cwresports.LobbyManager.Events.PlayerLeaveListener;
+import lk.cwresports.LobbyManager.Events.*;
 import lk.cwresports.LobbyManager.Tabs.LobbyManagerTab;
 import lk.cwresports.LobbyManager.Tabs.SelectSpawnTab;
 import lk.cwresports.LobbyManager.Utils.RotationCalculator;
@@ -54,10 +53,12 @@ public class CwRLobbyAPI extends JavaPlugin {
         getCommand(SelectSpawnCommand.NAME).setExecutor(new SelectSpawnCommand(playerData));
         getCommand(SelectSpawnCommand.NAME).setTabCompleter(new SelectSpawnTab());
 
-
         // events
         PlayerJoinToServer.register(this);
         PlayerLeaveListener.register(this);
+        PlayerFallToVoidListener.register(this);
+        PlayerHungryListener.register(this);
+        PlayerTakeDamage.register(this);
     }
 
     @Override
