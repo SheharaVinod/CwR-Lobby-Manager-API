@@ -281,14 +281,15 @@ public class LobbyManagerCommand implements CommandExecutor {
     private boolean set_group_lobby_rotation_time(Player admin, String[] strings) {
         if (strings.length < 3) {
             admin.sendMessage("§cUsage: /lobby-manager set_group_lobby_rotation_time <group> <TimeUnit>");
+            admin.sendMessage("§eAvailable time units: MINUTE, HOUR, DAY, WEEK, MONTH, MANUAL");
             return true;
         }
 
         String groupName = strings[1];
-        String timeUnit = strings[2].toUpperCase();
+        String timeUnitStr = strings[2].toUpperCase();
 
         try {
-            TimeUnits unit = TimeUnits.valueOf(timeUnit);
+            TimeUnits unit = TimeUnits.valueOf(timeUnitStr);
             LobbyGroup group = LobbyManager.getInstance().getLobbyGroup(groupName);
 
             if (group == null) {
@@ -298,13 +299,24 @@ public class LobbyManagerCommand implements CommandExecutor {
 
             group.setLobbyRotationTimeUnit(unit);
             if (unit != TimeUnits.MANUAL) {
-                group.setNextRotationTime(RotationCalculator.calculateNextRotation(unit));
+                long nextRotation = RotationCalculator.calculateNextRotation(unit);
+                if (nextRotation != -1) {
+                    group.setNextRotationTime(nextRotation);
+                } else {
+                    admin.sendMessage("§cFailed to calculate next rotation time!");
+                    return true;
+                }
             }
-            admin.sendMessage("§aRotation time unit set to " + timeUnit);
+            admin.sendMessage("§aRotation time unit set to " + timeUnitStr);
+            return true;
         } catch (IllegalArgumentException e) {
-            admin.sendMessage("§cInvalid time unit! Use MINUTE, HOUR, DAY, WEEK, MONTH, or MANUAL");
+            admin.sendMessage("§cInvalid time unit! Available: MINUTE, HOUR, DAY, WEEK, MONTH, MANUAL");
+            return true;
+        } catch (Exception e) {
+            admin.sendMessage("§cAn error occurred: " + e.getMessage());
+            e.printStackTrace();
+            return true;
         }
-        return true;
     }
 
     private boolean rotate_every_lobby_group(Player admin, String[] strings) {

@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class LobbyDataManager {
     private final JavaPlugin plugin;
@@ -32,15 +33,16 @@ public class LobbyDataManager {
             YamlConfiguration config = YamlConfiguration.loadConfiguration(dataFile);
 
             // Clear previous data
-            for (String key : config.getKeys(false)) config.set(key, null);
+            for (String key : config.getKeys(false)) {
+                config.set(key, null);
+            }
 
             // Save lobbies
             ConfigurationSection lobbiesSection = config.createSection("lobbies");
-            for (Map.Entry<String, Lobby> entry : lobbyManager.lobbyNameMap.entrySet()) {
-                Lobby lobby = entry.getValue();
+            for (Lobby lobby : lobbyManager.lobbyNameMap.values()) {
                 ConfigurationSection lobbySection = lobbiesSection.createSection(lobby.getWorld().getName());
 
-                // Always save all spawn locations
+                // Save spawn locations
                 List<String> serializedLocations = new ArrayList<>();
                 for (Location loc : lobby.getSpawnLocations()) {
                     serializedLocations.add(serializeLocation(loc));
@@ -50,7 +52,7 @@ public class LobbyDataManager {
                 // Save location type
                 lobbySection.set("location_type", lobby.getLocationTypes().name());
 
-                // Save event lobby data if applicable
+                // Save event lobby data
                 if (lobby instanceof EventLobbies event) {
                     lobbySection.set("event_lobby", true);
                     lobbySection.set("event_date", event.getEventDate());
@@ -60,8 +62,7 @@ public class LobbyDataManager {
 
             // Save groups
             ConfigurationSection groupsSection = config.createSection("groups");
-            for (Map.Entry<String, LobbyGroup> entry : lobbyManager.lobbyGroupMap.entrySet()) {
-                LobbyGroup group = entry.getValue();
+            for (LobbyGroup group : lobbyManager.lobbyGroupMap.values()) {
                 ConfigurationSection groupSection = groupsSection.createSection(group.getName());
 
                 List<String> lobbyNames = new ArrayList<>();
@@ -70,22 +71,26 @@ public class LobbyDataManager {
                 }
                 groupSection.set("lobbies", lobbyNames);
 
-                if (group.getCurrentLobby() != null)
+                if (group.getCurrentLobby() != null) {
                     groupSection.set("current_lobby", group.getCurrentLobby().getWorld().getName());
+                }
 
                 groupSection.set("rotation_time_unit", group.getLobbyRotationTimeUnit().name());
-                if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL)
+                if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL) {
                     groupSection.set("next_rotation_time", group.getNextRotationTime());
+                }
             }
 
             // Save default lobby
-            if (lobbyManager.defaultSelectedLobby != null)
+            if (lobbyManager.defaultSelectedLobby != null) {
                 config.set("default_lobby", lobbyManager.defaultSelectedLobby.getWorld().getName());
+            }
 
-            // Save event lobby names for reference
-            List<String> eventLobbyNames = new ArrayList<>();
-            for (EventLobbies eventLobby : lobbyManager.getEventLobbies())
-                eventLobbyNames.add(eventLobby.getWorld().getName());
+            // Save unique event lobby names
+            List<String> eventLobbyNames = lobbyManager.getEventLobbies().stream()
+                    .map(lobby -> lobby.getWorld().getName())
+                    .distinct()
+                    .collect(Collectors.toList());
             config.set("event_lobbies", eventLobbyNames);
 
             config.save(dataFile);
@@ -94,13 +99,13 @@ public class LobbyDataManager {
         }
     }
 
-
     public void loadData() {
         lobbyManager.isLoading = true;
         lobbyManager.lobbyNameMap.clear();
         lobbyManager.lobbyGroupMap.clear();
         lobbyManager.getEventLobbies().clear();
         lobbyManager.defaultSelectedLobby = null;
+
         if (!dataFile.exists()) {
             lobbyManager.isLoading = false;
             return;
@@ -108,78 +113,128 @@ public class LobbyDataManager {
 
         YamlConfiguration config = YamlConfiguration.loadConfiguration(dataFile);
         Map<String, Lobby> loadedLobbies = new HashMap<>();
+
+        // Load lobbies first
         ConfigurationSection lobbiesSection = config.getConfigurationSection("lobbies");
         if (lobbiesSection != null) {
             for (String lobbyName : lobbiesSection.getKeys(false)) {
                 ConfigurationSection lobbySection = lobbiesSection.getConfigurationSection(lobbyName);
                 World world = Bukkit.getWorld(lobbyName);
-                if (world == null) continue;
+                if (world == null) {
+                    plugin.getLogger().warning("World not found for lobby: " + lobbyName);
+                    continue;
+                }
+
                 List<String> serializedLocations = lobbySection.getStringList("spawn_locations");
-                if (serializedLocations.isEmpty()) continue;
+                if (serializedLocations.isEmpty()) {
+                    plugin.getLogger().warning("No spawn locations found for lobby: " + lobbyName);
+                    continue;
+                }
+
                 Location firstLoc = deserializeLocation(serializedLocations.get(0));
-                if (firstLoc == null) continue;
+                if (firstLoc == null) {
+                    plugin.getLogger().warning("Failed to deserialize first location for lobby: " + lobbyName);
+                    continue;
+                }
+
                 Lobby lobby;
                 if (lobbySection.getBoolean("event_lobby", false)) {
                     EventLobbies eventLobby = new EventLobbies(firstLoc);
+                    // Remove potential duplicate added by constructor
+                    lobbyManager.getEventLobbies().removeIf(l ->
+                            l.getWorld().getName().equalsIgnoreCase(lobbyName));
+
                     eventLobby.getSpawnLocations().clear();
                     for (String serializedLoc : serializedLocations) {
                         Location loc = deserializeLocation(serializedLoc);
                         if (loc != null) eventLobby.addSpawnLocation(loc);
                     }
-                    eventLobby.setLocationTypes(NextLocationTypes.valueOf(lobbySection.getString("location_type", "DEFAULT")));
+                    eventLobby.setLocationTypes(NextLocationTypes.valueOf(
+                            lobbySection.getString("location_type", "DEFAULT")));
                     eventLobby.setPeriod(
                             lobbySection.getString("event_date", null),
-                            lobbySection.getString("expire_days", "0")
-                    );
+                            lobbySection.getString("expire_days", "0"));
                     lobby = eventLobby;
-                    // No need to manually add to eventLobbies - constructor already did it
                 } else {
-                    lobby = new Lobby(firstLoc);
+                    lobby = new GroupLobbies(firstLoc);
                     lobby.getSpawnLocations().clear();
                     for (String serializedLoc : serializedLocations) {
                         Location loc = deserializeLocation(serializedLoc);
                         if (loc != null) lobby.addSpawnLocation(loc);
                     }
-                    lobby.setLocationTypes(NextLocationTypes.valueOf(lobbySection.getString("location_type", "DEFAULT")));
+                    lobby.setLocationTypes(NextLocationTypes.valueOf(
+                            lobbySection.getString("location_type", "DEFAULT")));
                 }
                 loadedLobbies.put(lobbyName, lobby);
                 lobbyManager.registerNameFor(lobby);
             }
         }
 
+        // Load groups and their lobby assignments
         ConfigurationSection groupsSection = config.getConfigurationSection("groups");
         if (groupsSection != null) {
             for (String groupName : groupsSection.getKeys(false)) {
                 ConfigurationSection groupSection = groupsSection.getConfigurationSection(groupName);
-                LobbyGroup group = new LobbyGroup(groupName);
+                LobbyGroup group = lobbyManager.getLobbyGroup(groupName);
+                if (group == null) {
+                    group = new LobbyGroup(groupName);
+                }
+
                 List<String> lobbyNames = groupSection.getStringList("lobbies");
                 for (String lobbyName : lobbyNames) {
                     Lobby lobby = loadedLobbies.get(lobbyName);
-                    if (lobby != null) group.addLobby(lobby);
+                    if (lobby != null && !group.getLobbies().contains(lobby)) {
+                        group.addLobby(lobby);
+                    }
                 }
+
                 String currentLobbyName = groupSection.getString("current_lobby");
                 if (currentLobbyName != null) {
                     Lobby currentLobby = loadedLobbies.get(currentLobbyName);
-                    if (currentLobby != null) group.setCurrentLobby(currentLobby);
+                    if (currentLobby != null) {
+                        group.setCurrentLobby(currentLobby);
+                    }
                 }
-                lobbyManager.registerLobbyGroup(group);
+
                 String rotationUnit = groupSection.getString("rotation_time_unit");
                 if (rotationUnit != null) {
-                    group.setLobbyRotationTimeUnit(TimeUnits.valueOf(rotationUnit));
-                    if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL)
-                        group.setNextRotationTime(groupSection.getLong("next_rotation_time", -1));
+                    try {
+                        group.setLobbyRotationTimeUnit(TimeUnits.valueOf(rotationUnit));
+                        if (group.getLobbyRotationTimeUnit() != TimeUnits.MANUAL) {
+                            group.setNextRotationTime(groupSection.getLong("next_rotation_time", -1));
+                        }
+                    } catch (IllegalArgumentException e) {
+                        plugin.getLogger().warning("Invalid rotation time unit for group " + groupName + ": " + rotationUnit);
+                    }
+                }
+
+                lobbyManager.registerLobbyGroup(group);
+            }
+        }
+
+        // Load default lobby
+        String defaultLobbyName = config.getString("default_lobby");
+        if (defaultLobbyName != null) {
+            Lobby defaultLobby = loadedLobbies.get(defaultLobbyName);
+            if (defaultLobby != null) {
+                lobbyManager.defaultSelectedLobby = defaultLobby;
+            }
+        }
+
+        // Handle event_lobbies section (remove duplicates)
+        Set<String> uniqueEventLobbyNames = new HashSet<>(config.getStringList("event_lobbies"));
+        for (String lobbyName : uniqueEventLobbyNames) {
+            Lobby lobby = loadedLobbies.get(lobbyName);
+            if (lobby instanceof EventLobbies) {
+                // Ensure we don't add duplicates
+                boolean alreadyExists = lobbyManager.getEventLobbies().stream()
+                        .anyMatch(l -> l.getWorld().getName().equalsIgnoreCase(lobbyName));
+                if (!alreadyExists) {
+                    lobbyManager.getEventLobbies().add((EventLobbies) lobby);
                 }
             }
         }
 
-        String defaultLobbyName = config.getString("default_lobby");
-        if (defaultLobbyName != null) {
-            Lobby defaultLobby = loadedLobbies.get(defaultLobbyName);
-            if (defaultLobby != null)
-                lobbyManager.defaultSelectedLobby = defaultLobby;
-        }
-
-        // Removed the duplicate event lobby loading section
         lobbyManager.isLoading = false;
     }
 

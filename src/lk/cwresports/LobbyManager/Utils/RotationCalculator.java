@@ -1,7 +1,6 @@
 package lk.cwresports.LobbyManager.Utils;
 
 import java.util.Calendar;
-
 import lk.cwresports.LobbyManager.API.TimeUnits;
 import lk.cwresports.LobbyManager.CwRLobbyAPI;
 
@@ -24,7 +23,6 @@ public class RotationCalculator {
         switch (unit) {
             case MINUTE:
                 calendar.add(Calendar.MINUTE, 1);
-                calendar.set(Calendar.SECOND, 0);
                 break;
 
             case HOUR:
@@ -56,6 +54,7 @@ public class RotationCalculator {
                 return -1;
         }
 
+        // Remove time offset
         calendar.add(Calendar.MILLISECOND, (int)(-timeOffsetHours * 3600000));
 
         return calendar.getTimeInMillis();

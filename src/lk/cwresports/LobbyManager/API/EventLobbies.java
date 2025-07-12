@@ -10,8 +10,8 @@ public class EventLobbies extends Lobby {
     private long eventEndMillis = -1;
 
     public EventLobbies(Location currentLocation) {
-        super(currentLocation);
-        this.addSpawnLocation(currentLocation); // Add this line
+        super(currentLocation); // This adds the first spawn location
+        // Don't add it again here
         LobbyManager.getInstance().getEventLobbies().add(this);
     }
 

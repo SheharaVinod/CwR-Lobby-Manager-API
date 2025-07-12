@@ -23,21 +23,16 @@ public class Lobby {
         this.world = currentLocation.getWorld();
         this.defaultSpawnLocation = currentLocation;
         this.nextLocation = currentLocation;
-        this.spawn_locations.add(currentLocation); // Add initial spawn location
-    }
-
-    public void setLocationTypes(NextLocationTypes locationTypes) {
-        this.locationTypes = locationTypes;
+        this.spawn_locations.add(currentLocation); // Keep this line to ensure at least one spawn exists
     }
 
     public void addSpawnLocation(Location location) {
-        if (location.getWorld() == this.world) {
+        if (location.getWorld() == this.world && !spawn_locations.contains(location)) {
             spawn_locations.add(location);
-            // If this is the first spawn location added, set it as default
-            if (spawn_locations.size() == 1) {
-                defaultSpawnLocation = location;
-            }
         }
+    }
+    public void setLocationTypes(NextLocationTypes locationTypes) {
+        this.locationTypes = locationTypes;
     }
 
     public void setDefaultSpawnLocation(Location location) {
