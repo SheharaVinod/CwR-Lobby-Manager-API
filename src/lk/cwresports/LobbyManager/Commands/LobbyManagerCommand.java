@@ -43,7 +43,6 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_admin = "admin";
     public static final String sub_set_period = "set_period";
     public static final String sub_help = "help";
-    public static final String sub_info = "info";
     public static final String sub_save = "save";
 
     public static final String[] subs = {
@@ -61,7 +60,6 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_admin,
             sub_set_period,
             sub_help,
-            sub_info,
             sub_save,
             sub_change_lobby_rotation,
             sub_set_group_lobby_rotation_time,
@@ -113,8 +111,6 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return save(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_help)) {
                 return help(admin, strings);
-            } else if (strings[0].equalsIgnoreCase(sub_info)) {
-                return info(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_create_lobby)) {
                 return create_lobby(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_create_event_lobby)) {
@@ -169,21 +165,45 @@ public class LobbyManagerCommand implements CommandExecutor {
         for (EventLobbies eventLobby : eventLobbies) {
             String worldName = eventLobby.getWorld().getName();
             String eventDate = eventLobby.getEventDate();
-            int expireDays = eventLobby.getExpireDays();
+            String expirePeriod = eventLobby.getExpireDays();
 
-            if (eventDate == null) {
+            if (eventDate == null || expirePeriod == null) {
                 admin.sendMessage("§e" + worldName + "§7: §cEvent period not set");
-            } else {
-                String[] parts = eventDate.split("-");
-                if (parts.length >= 2) {
-                    String month = parts[0];
-                    String day = parts[1];
-                    String hour = parts.length > 2 ? parts[2] : "00";
-                    String minute = parts.length > 3 ? parts[3] : "00";
-                    admin.sendMessage("§e" + worldName + "§7 - " + month + "/" + day + " " + hour + ":" + minute + " - " + expireDays + " days");
-                } else {
-                    admin.sendMessage("§e" + worldName + "§7: §cInvalid date format");
+                continue;
+            }
+
+            try {
+                // Parse and format the date
+                String[] dateParts = eventDate.split("-");
+                String formattedDate;
+
+                if (dateParts.length == 5) { // MM-DD-HH-mm-ss
+                    formattedDate = String.format("%s/%s %s:%s",
+                            dateParts[0], dateParts[1], dateParts[2], dateParts[3]);
+                } else { // DD-HH-mm-ss
+                    formattedDate = String.format("%s %s:%s",
+                            dateParts[0], dateParts[1], dateParts[2]);
                 }
+
+                // Parse and format the expiration
+                String[] expireParts = expirePeriod.split("-");
+                String formattedExpire;
+
+                if (expireParts.length == 1) { // Days only
+                    formattedExpire = expireParts[0] + " days";
+                } else { // DD-HH-mm-ss
+                    formattedExpire = String.format("%sd %sh %sm",
+                            expireParts[0], expireParts[1], expireParts[2]);
+                    if (expireParts.length > 3) {
+                        formattedExpire += " " + expireParts[3] + "s";
+                    }
+                }
+
+                admin.sendMessage("§e" + worldName + "§7 - Starts: §a" + formattedDate +
+                        "§7 - Duration: §a" + formattedExpire);
+
+            } catch (Exception e) {
+                admin.sendMessage("§e" + worldName + "§7: §cInvalid date format");
             }
         }
 
@@ -309,13 +329,22 @@ public class LobbyManagerCommand implements CommandExecutor {
 
     public boolean set_period(Player admin, String[] strings) {
         if (strings.length < 3) {
-            admin.sendMessage("§cUsage: /lobby-manager set_period <MM-DD-HH-mm-ss> <days>");
+            admin.sendMessage("§cUsage: /lobby-manager set_period <MM-DD-HH-mm-ss|DD-HH-mm-ss> <days|DD-HH-mm-ss>");
+            admin.sendMessage("§eExamples:");
+            admin.sendMessage("§7- /lobby-manager set_period 12-25-15-00-00 7 (Dec 25th 3PM, 7 days)");
+            admin.sendMessage("§7- /lobby-manager set_period 25-15-00-00 2-12-30 (25th 3PM, 2 days 12h 30m)");
+            admin.sendMessage("§7- /lobby-manager set_period 07-12-09-49-00 00-12-00 (July 12th 9:49AM, 12 hours)");
             return true;
         }
 
         try {
             String date = strings[1];
-            int expireDays = Integer.parseInt(strings[2].replace("d", ""));
+            StringBuilder expirePeriod = new StringBuilder(strings[2]);
+
+            // Combine additional expiration parts if provided
+            for (int i = 3; i < strings.length; i++) {
+                expirePeriod.append("-").append(strings[i]);
+            }
 
             // Validate lobby type
             Lobby lobby = LobbyManager.getInstance().getLobbyByName(admin.getWorld().getName());
@@ -324,13 +353,18 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return true;
             }
 
-            ((EventLobbies) lobby).setPeriod(date, expireDays);
+            ((EventLobbies) lobby).setPeriod(date, expirePeriod.toString());
             admin.sendMessage("§aEvent period set successfully!");
+            admin.sendMessage("§7Start: §e" + date);
+            admin.sendMessage("§7Duration: §e" + expirePeriod);
         } catch (IllegalArgumentException e) {
-            admin.sendMessage("§cInvalid arguments! Format: MM-DD-HH-mm-ss days");
             admin.sendMessage("§cError: " + e.getMessage());
+            admin.sendMessage("§cValid formats:");
+            admin.sendMessage("§7Date: §eMM-DD-HH-mm-ss §7or §eDD-HH-mm-ss");
+            admin.sendMessage("§7Duration: §edays §7or §eDD-HH-mm-ss");
         } catch (Exception e) {
-            admin.sendMessage("§cAn error occurred while setting the event period");
+            admin.sendMessage("§cAn unexpected error occurred");
+            e.printStackTrace();
         }
         return true;
     }
@@ -497,13 +531,6 @@ public class LobbyManagerCommand implements CommandExecutor {
     public boolean save(Player admin, String[] strings) {
         new LobbyDataManager((JavaPlugin) this.plugin).saveData();
         admin.sendMessage(TextStrings.colorize("Saved.!"));
-        return true;
-    }
-
-    public boolean info(Player admin, String[] strings) {
-        // TODO: print all information about , lobby group and lobbies. in chat. this is maybe hugh. but it's fine.
-        //? lobby groups. and there lobbies. and also next location types. and also there names.
-
         return true;
     }
 

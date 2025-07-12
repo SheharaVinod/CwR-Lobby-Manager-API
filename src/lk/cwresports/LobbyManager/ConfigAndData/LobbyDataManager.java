@@ -129,7 +129,7 @@ public class LobbyDataManager {
                     eventLobby.setLocationTypes(NextLocationTypes.valueOf(lobbySection.getString("location_type", "DEFAULT")));
                     eventLobby.setPeriod(
                             lobbySection.getString("event_date", null),
-                            lobbySection.getInt("expire_days", 0)
+                            lobbySection.getString("expire_days", "0")
                     );
                     lobby = eventLobby;
                     // No need to manually add to eventLobbies - constructor already did it

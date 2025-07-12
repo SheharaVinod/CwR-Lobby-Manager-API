@@ -52,7 +52,7 @@ public class LobbyManagerTab implements TabCompleter {
                 if (strings.length == 2) {
                     return List.of("<MM-DD-HH-mm-ss>");
                 } else if (strings.length == 3) {
-                    return List.of("1", "2", "4", "5", "6", "7");
+                    return List.of("<DD-HH-mm-ss>");
                 }
 
             }
