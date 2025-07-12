@@ -11,6 +11,7 @@ public class EventLobbies extends Lobby {
 
     public EventLobbies(Location currentLocation) {
         super(currentLocation);
+        this.addSpawnLocation(currentLocation); // Add this line
         LobbyManager.getInstance().getEventLobbies().add(this);
     }
 

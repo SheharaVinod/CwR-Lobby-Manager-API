@@ -17,15 +17,13 @@ public class Lobby {
     private Location nextLocation;
     private NextLocationTypes locationTypes = NextLocationTypes.DEFAULT;
     private final Random random = new Random();
+    private int currentSpawnIndex = 0; // Track current index for circular rotation
 
     public Lobby(Location currentLocation) {
         this.world = currentLocation.getWorld();
         this.defaultSpawnLocation = currentLocation;
         this.nextLocation = currentLocation;
-
-        // spawn_locations.add(currentLocation);
-
-        LobbyManager.getInstance().registerNameFor(this);
+        this.spawn_locations.add(currentLocation); // Add initial spawn location
     }
 
     public void setLocationTypes(NextLocationTypes locationTypes) {
@@ -35,14 +33,21 @@ public class Lobby {
     public void addSpawnLocation(Location location) {
         if (location.getWorld() == this.world) {
             spawn_locations.add(location);
+            // If this is the first spawn location added, set it as default
+            if (spawn_locations.size() == 1) {
+                defaultSpawnLocation = location;
+            }
         }
     }
 
     public void setDefaultSpawnLocation(Location location) {
-        if (location == null) return;
+        if (location == null || location.getWorld() != this.world) return;
         this.defaultSpawnLocation = location;
-        this.spawn_locations.remove(0);
-        this.spawn_locations.add(0, location);
+        // Ensure it exists in spawn locations
+        if (!spawn_locations.contains(location)) {
+            spawn_locations.add(0, location);
+        }
+        currentSpawnIndex = 0; // Reset rotation index
     }
 
     public World getWorld() {
@@ -63,24 +68,20 @@ public class Lobby {
     }
 
     private Location getNextLocation() {
-        if (this.spawn_locations.size() <= 1) {
+        if (this.spawn_locations.isEmpty()) {
             return defaultSpawnLocation;
         }
 
         if (this.locationTypes == NextLocationTypes.DEFAULT) {
             return defaultSpawnLocation;
         } else if (this.locationTypes == NextLocationTypes.RANDOM) {
-            int nextInt = random.nextInt(spawn_locations.size());
-            this.nextLocation = spawn_locations.get(nextInt);
+            return spawn_locations.get(random.nextInt(spawn_locations.size()));
         } else if (this.locationTypes == NextLocationTypes.CIRCULAR) {
-            int currentIndex = this.spawn_locations.indexOf(this.nextLocation);
-            if (currentIndex == this.spawn_locations.size() - 1) {
-                this.nextLocation = this.spawn_locations.get(0);
-            } else {
-                this.nextLocation = this.spawn_locations.get(currentIndex + 1);
-            }
+            // Circular rotation logic
+            currentSpawnIndex = (currentSpawnIndex + 1) % spawn_locations.size();
+            return spawn_locations.get(currentSpawnIndex);
         }
-        return nextLocation;
+        return defaultSpawnLocation;
     }
 
     public Location getDefaultSpawnLocation() {

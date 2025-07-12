@@ -11,6 +11,7 @@ import lk.cwresports.LobbyManager.Tabs.LobbyManagerTab;
 import lk.cwresports.LobbyManager.Tabs.SelectSpawnTab;
 import lk.cwresports.LobbyManager.Utils.RotationCalculator;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class CwRLobbyAPI extends JavaPlugin {
     public static final String PREFIX = "&7[&6CwRLobbyAPI&7]&r ";
@@ -30,10 +31,15 @@ public class CwRLobbyAPI extends JavaPlugin {
         playerData = new PlayerDataManager(this);
         RotationCalculator.init(this);
 
-
-        // load lobby manager;
-        LobbyManager.getInstance().load();
-        LobbyManager.getInstance().startRotationScheduler();
+        new BukkitRunnable() {
+            // this will run after all world are loaded.
+            @Override
+            public void run() {
+                // load lobby manager;
+                LobbyManager.getInstance().load();
+                LobbyManager.getInstance().startRotationScheduler();
+            }
+        }.runTaskLater(this, 1);
 
         // commands
         getCommand(SpawnCommand.NAME).setExecutor(new SpawnCommand(this));
