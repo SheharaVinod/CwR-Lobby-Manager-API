@@ -50,6 +50,7 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_set_period = "set_period";
     public static final String sub_help = "help";
     public static final String sub_save = "save";
+    public static final String sub_info = "info";
 
     public static final String[] subs = {
             sub_create_group,
@@ -75,7 +76,8 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_disabled_hunger,
             sub_disabled_damage,
             sub_set_game_mod,
-            sub_cansel_player_interaction
+            sub_cansel_player_interaction,
+            sub_info
     };
 
     Plugin plugin;
@@ -163,11 +165,91 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return set_game_mod(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_cansel_player_interaction)) {
                 return cansel_player_interaction(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_info)) {
+                return info(admin, strings);
             }
         }
 
         return true;
     }
+
+    public boolean info(Player admin, String[] strings) {
+        // Check if player is in a lobby
+        if (!LobbyManager.getInstance().isInALobby(admin)) {
+            admin.sendMessage(TextStrings.colorize("§cThis is not a lobby."));
+            return true;
+        }
+
+        String worldName = admin.getWorld().getName();
+        Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+
+        if (lobby == null) {
+            admin.sendMessage(TextStrings.colorize("§cThis is not a lobby."));
+            return true;
+        }
+
+        // Display lobby information
+        admin.sendMessage(TextStrings.colorize("§6§l=== Lobby Information ==="));
+        admin.sendMessage(TextStrings.colorize("§eLobby Name: §f" + worldName));
+
+        // Lobby type
+        String lobbyType = lobby.isEventLobby() ? "Event Lobby" : "Group Lobby";
+        admin.sendMessage(TextStrings.colorize("§eLobby Type: §f" + lobbyType));
+
+        // Game mode
+        admin.sendMessage(TextStrings.colorize("§eGame Mode: §f" + lobby.getGameMode().name()));
+
+        // Disabled features
+        admin.sendMessage(TextStrings.colorize("§eDisabled Hunger: §f" + lobby.isDisabledHunger()));
+        admin.sendMessage(TextStrings.colorize("§eDisabled Damage: §f" + lobby.isDisabledDamage()));
+        admin.sendMessage(TextStrings.colorize("§eCancel Player Interactions: §f" + lobby.isCanselInteraction()));
+
+        // Location settings
+        admin.sendMessage(TextStrings.colorize("§eSpawn Rotation Type: §f" + lobby.getLocationTypes().name()));
+        admin.sendMessage(TextStrings.colorize("§eTotal Spawn Locations: §f" + lobby.getSpawnLocations().size()));
+
+        // Default spawn location
+        Location defaultSpawn = lobby.getDefaultSpawnLocation();
+        if (defaultSpawn != null) {
+            admin.sendMessage(TextStrings.colorize("§eDefault Spawn: §f" +
+                    String.format("X: %.1f, Y: %.1f, Z: %.1f",
+                            defaultSpawn.getX(), defaultSpawn.getY(), defaultSpawn.getZ())));
+        }
+
+        // Event lobby specific information
+        if (lobby.isEventLobby() && lobby instanceof EventLobbies) {
+            EventLobbies eventLobby = (EventLobbies) lobby;
+            admin.sendMessage(TextStrings.colorize("§6§l--- Event Lobby Details ---"));
+
+            String eventDate = eventLobby.getEventDate();
+            String expirePeriod = eventLobby.getExpireDays();
+
+            if (eventDate != null && expirePeriod != null) {
+                admin.sendMessage(TextStrings.colorize("§eEvent Date: §f" + eventDate));
+                admin.sendMessage(TextStrings.colorize("§eExpire Period: §f" + expirePeriod));
+                admin.sendMessage(TextStrings.colorize("§eEvent Active: §f" + eventLobby.isEvent()));
+            } else {
+                admin.sendMessage(TextStrings.colorize("§cEvent period not configured"));
+            }
+        } else {
+            // Group lobby specific information
+            LobbyGroup currentGroup = LobbyManager.getInstance().getCurrentGroupOf(lobby);
+            if (currentGroup != null) {
+                admin.sendMessage(TextStrings.colorize("§6§l--- Group Lobby Details ---"));
+                admin.sendMessage(TextStrings.colorize("§eGroup Name: §f" + currentGroup.getName()));
+                admin.sendMessage(TextStrings.colorize("§eGroup Rotation Type: §f" + currentGroup.getLobbyRotationType()));
+                admin.sendMessage(TextStrings.colorize("§eGroup Rotation Schedule: §f" + currentGroup.getLobbyRotationTimeUnit().name()));
+                admin.sendMessage(TextStrings.colorize("§eTotal Lobbies in Group: §f" + currentGroup.getLobbies().size()));
+
+                boolean isCurrentLobby = (currentGroup.getCurrentLobby() == lobby);
+                admin.sendMessage(TextStrings.colorize("§eIs Current Active Lobby: §f" + isCurrentLobby));
+            }
+        }
+
+        admin.sendMessage(TextStrings.colorize("§6§l========================"));
+        return true;
+    }
+
 
     public boolean disabled_hunger(Player admin, String[] strings) {
         // /lobby-manager disabled_hunger true
