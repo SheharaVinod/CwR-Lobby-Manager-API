@@ -2,6 +2,7 @@ package lk.cwresports.LobbyManager.ConfigAndData;
 
 import lk.cwresports.LobbyManager.API.*;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -54,6 +55,8 @@ public class LobbyDataManager {
                 // Save hunger and damage settings
                 lobbySection.set("disabled_hunger", lobby.isDisabledHunger());
                 lobbySection.set("disabled_damage", lobby.isDisabledDamage());
+                lobbySection.set("game_mode", lobby.getGameMode().name());
+                lobbySection.set("cansel_interaction", lobby.isCanselInteraction());
 
                 // Save event lobby data
                 if (lobby instanceof EventLobbies event) {
@@ -170,6 +173,14 @@ public class LobbyDataManager {
                 }
                 lobby.setDisabledHunger(lobbySection.getBoolean("disabled_hunger", true));
                 lobby.setDisabledDamage(lobbySection.getBoolean("disabled_damage", true));
+
+                try {
+                    GameMode gameMode = GameMode.valueOf(lobbySection.getString("game_mode", "ADVENTURE"));
+                    lobby.setGameMode(gameMode);
+                } catch (IllegalArgumentException e) {
+                    lobby.setGameMode(GameMode.ADVENTURE);
+                }
+                lobby.setCanselInteraction(lobbySection.getBoolean("cansel_interaction", false));
 
                 loadedLobbies.put(lobbyName, lobby);
                 lobbyManager.registerNameFor(lobby);

@@ -1,8 +1,11 @@
 package lk.cwresports.LobbyManager.API;
 
 
+import lk.cwresports.LobbyManager.CwRLobbyAPI;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -15,12 +18,15 @@ public class Lobby {
     private final List<Location> spawn_locations = new ArrayList<>();
     private Location defaultSpawnLocation;
 
-    private NextLocationTypes locationTypes = NextLocationTypes.DEFAULT;
     private final Random random = new Random();
     private int currentSpawnIndex = 0; // Track current index for circular rotation
 
+    private NextLocationTypes locationTypes = NextLocationTypes.DEFAULT;
     private boolean disabledHunger = true;
     private boolean disabledDamage = true;
+    private boolean canselInteraction = false;
+
+    private GameMode gameMode = GameMode.ADVENTURE;
 
     public Lobby(Location currentLocation) {
         this.world = currentLocation.getWorld();
@@ -31,8 +37,20 @@ public class Lobby {
         LobbyManager.getInstance().registerWorld(this.world);
     }
 
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    public GameMode getGameMode() {
+        return this.gameMode;
+    }
+
     public void setDisabledHunger(boolean b) {
         this.disabledHunger = b;
+    }
+
+    public void setCanselInteraction(boolean b) {
+        this.canselInteraction = b;
     }
 
     public void setDisabledDamage(boolean b) {
@@ -41,6 +59,10 @@ public class Lobby {
 
     public boolean isDisabledHunger() {
         return disabledHunger;
+    }
+
+    public boolean isCanselInteraction() {
+        return canselInteraction;
     }
 
     public boolean isDisabledDamage() {
@@ -82,7 +104,15 @@ public class Lobby {
     public void send(Player player) {
         player.teleport(getNextLocation());
 
+        if (player.hasPermission("cwr-core.lobby-manager.admin")) {
+            FileConfiguration config = CwRLobbyAPI.getPlugin().getConfig();
+            boolean admin_bypass = config.getBoolean("change-game-mod-of-admins-after-teleport-to-spawn", false);
+            if (!admin_bypass) {
+                return;
+            }
+        }
 
+        player.setGameMode(getGameMode());
     }
 
     private Location getNextLocation() {

@@ -59,6 +59,7 @@ public class CwRLobbyAPI extends JavaPlugin {
         PlayerFallToVoidListener.register(this);
         PlayerHungryListener.register(this);
         PlayerTakeDamage.register(this);
+        WhenPlayerInteractLobbyBlocks.register(this);
     }
 
     @Override

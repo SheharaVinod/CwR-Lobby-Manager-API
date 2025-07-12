@@ -5,6 +5,7 @@ import lk.cwresports.LobbyManager.ConfigAndData.LobbyDataManager;
 import lk.cwresports.LobbyManager.Utils.PermissionNodes;
 import lk.cwresports.LobbyManager.Utils.RotationCalculator;
 import lk.cwresports.LobbyManager.Utils.TextStrings;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -28,6 +29,8 @@ public class LobbyManagerCommand implements CommandExecutor {
 
     public static final String sub_disabled_hunger = "disabled_hunger";
     public static final String sub_disabled_damage = "disabled_damage";
+    public static final String sub_set_game_mod = "set_game_mod";
+    public static final String sub_cansel_player_interaction = "cansel_player_interaction";
 
     public static final String sub_add_a_new_spawn = "add_a_new_spawn";
     public static final String sub_set_default_spawn = "set_default_spawn";
@@ -70,7 +73,9 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_info_of_all_event_lobbies,
             sub_info_of_all_groups,
             sub_disabled_hunger,
-            sub_disabled_damage
+            sub_disabled_damage,
+            sub_set_game_mod,
+            sub_cansel_player_interaction
     };
 
     Plugin plugin;
@@ -154,6 +159,10 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return disabled_hunger(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_disabled_damage)) {
                 return disabled_damage(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_set_game_mod)) {
+                return set_game_mod(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_cansel_player_interaction)) {
+                return cansel_player_interaction(admin, strings);
             }
         }
 
@@ -182,6 +191,54 @@ public class LobbyManagerCommand implements CommandExecutor {
             return true;
         }
 
+        return true;
+    }
+
+    public boolean cansel_player_interaction(Player admin, String[] strings) {
+        // /lobby-manager cansel_player_interaction true
+        if (strings.length < 2) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        try {
+            boolean value = Boolean.parseBoolean(strings[0]);
+            if (!LobbyManager.getInstance().isInALobby(admin)) {
+                admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+                return true;
+            }
+
+            String worldName = admin.getWorld().getName();
+            Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+
+            lobby.setCanselInteraction(value);
+        } catch (Exception e) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        return true;
+    }
+
+    public boolean set_game_mod(Player admin, String[] strings) {
+        // /lobby-manager set_game_mod ADVENTURE
+        if (strings.length < 2) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        try {
+            GameMode gameMode = GameMode.valueOf(strings[1]);
+            if (!LobbyManager.getInstance().isInALobby(admin)) {
+                admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+                return true;
+            }
+
+            String worldName = admin.getWorld().getName();
+            Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+
+            lobby.setGameMode(gameMode);
+        } catch (Exception e) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
         return true;
     }
 

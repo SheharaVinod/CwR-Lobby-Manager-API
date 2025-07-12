@@ -33,3 +33,11 @@ auto-teleport-back-to-spawn-when-y-level: -300 # when falling to void.
 # We can set game mod of every spawn lobby ,
 # by default it's null mean never change game mod when you teleport to the spawn.
 change-game-mod-of-admins-after-teleport-to-spawn: false # ignore if admin.
+
+# -------- default properties of a group. ----------
+# NOTE: this lines are only comment just make people to know.
+# disabled_hunger - true
+# disabled_damage - true
+# cansel_player_interaction - false <- you need set this value to true if you create a lobby in survival mod , this cancel all player interactions.
+# set_game_mod - ADVENTURE
+#
