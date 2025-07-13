@@ -3,10 +3,8 @@
     <output-path>$PROJECT_DIR$/../../minecraft/CaptureTheFlagMinecraftServer/plugins</output-path>
     <root id="archive" name="CwR-Lobby-Manager-API.jar">
       <element id="module-output" name="CwR-Lobby-Manager-API" />
-      <element id="file-copy" path="$PROJECT_DIR$/src/timezones.json" />
       <element id="file-copy" path="$PROJECT_DIR$/src/plugin.yml" />
       <element id="file-copy" path="$PROJECT_DIR$/src/config.yml" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/json-20150729.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
