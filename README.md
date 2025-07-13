@@ -358,7 +358,10 @@ We welcome contributions! Please follow these steps:
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+CwR Lobby Manager API is released under the GNU General Public License v3.0.  
+You are free to fork, modify, and redistribute the plugin **as long as** the
+source code of any distributed version remains available under the same
+license. See the LICENSE file for full terms.
 
 ---
 
