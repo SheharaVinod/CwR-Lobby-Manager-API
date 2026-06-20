@@ -18,19 +18,22 @@
 
 package lk.cwresports.LobbyManager.Events;
 
+
 import lk.cwresports.LobbyManager.API.Lobby;
 import lk.cwresports.LobbyManager.API.LobbyManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.Plugin;
 
-public class PlayerHungryListener implements Listener {
+public class PlayerTakeDamage implements Listener {
 
     @EventHandler
-    public void onPlayerHungry(FoodLevelChangeEvent event) {
-        if (event.getEntity() instanceof Player player) {
+    public void onPlayerDamageByEntity(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
             if (!LobbyManager.getInstance().isInALobby(player)) {
                 return;
             }
@@ -40,13 +43,35 @@ public class PlayerHungryListener implements Listener {
             if (lobby == null) {
                 return;
             }
-            if (lobby.isDisabledHunger()) {
+
+            if (lobby.isDisabledDamage()) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDamageByEntity(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (!LobbyManager.getInstance().isInALobby(player)) {
+                return;
+            }
+
+            String worldName = player.getWorld().getName();
+            Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+            if (lobby == null) {
+                return;
+            }
+
+            if (lobby.isDisabledDamage()) {
                 event.setCancelled(true);
             }
         }
     }
 
     public static void register(Plugin plugin) {
-        plugin.getServer().getPluginManager().registerEvents(new PlayerHungryListener(), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new PlayerTakeDamage(), plugin);
     }
+
 }

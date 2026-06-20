@@ -206,8 +206,9 @@ public class LobbyManager {
                 eventLobbies.remove(lobby);
             }
 
-            // Remove from name map
+            // Remove from name map and world set
             lobbyNameMap.remove(name);
+            lobbyWorlds.remove(lobby.getWorld());
         }
     }
 

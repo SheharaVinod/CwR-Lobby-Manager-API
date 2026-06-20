@@ -52,7 +52,9 @@ public class Lobby {
 
         this.spawn_locations.add(currentLocation); // Keep this line to ensure at least one spawn exists
 
-        LobbyManager.getInstance().registerWorld(this.world);
+        LobbyManager manager = LobbyManager.getInstance();
+        manager.registerWorld(this.world);
+        manager.registerNameFor(this);
     }
 
     public void setGameMode(GameMode gameMode) {

@@ -49,9 +49,10 @@ public class SpawnCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if (!(commandSender instanceof Player player)) {
+        if (!(commandSender instanceof Player)) {
             return true;
         }
+        Player player = (Player) commandSender;
 
         if (LobbyManager.isBlockedSpawnCommand(player)) {
             player.sendMessage(TextStrings.colorize("you cant use this command right now.", false));

@@ -32,7 +32,7 @@ public class WhenPlayerInteractLobbyBlocks implements Listener {
         if (LobbyManager.getInstance().isInALobby(event.getPlayer())) {
             World world = event.getPlayer().getWorld();
             Lobby lobby = LobbyManager.getInstance().getLobbyByName(world.getName());
-            if (lobby.isCanselInteraction()) {
+            if (lobby != null && lobby.isCanselInteraction()) {
                 event.setCancelled(true);
             }
         }

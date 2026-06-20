@@ -38,10 +38,11 @@ public class SelectSpawnCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(TextStrings.colorize(TextStrings.ONLY_PLAYERS_CAN_EXECUTE_THIS_COMMAND, false));
             return true;
         }
+        Player player = (Player) sender;
 
         if (args.length != 1) {
             player.sendMessage(TextStrings.colorize("&cUsage: /select-spawn <group>", false));

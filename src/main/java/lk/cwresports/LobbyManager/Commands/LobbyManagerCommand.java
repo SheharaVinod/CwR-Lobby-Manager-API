@@ -116,9 +116,10 @@ public class LobbyManagerCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if (!(commandSender instanceof Player admin)) {
+        if (!(commandSender instanceof Player)) {
             return true;
         }
+        Player admin = (Player) commandSender;
 
         if (!admin.hasPermission(PermissionNodes.ADMIN)) {
             admin.sendMessage(TextStrings.colorize(TextStrings.YOU_DONT_HAVE_PERMISSION));

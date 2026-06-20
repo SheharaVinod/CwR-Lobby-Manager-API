@@ -36,9 +36,10 @@ public class LobbyManagerTab implements TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        if (!(commandSender instanceof Player admin)) {
-            return List.of();
+        if (!(commandSender instanceof Player)) {
+            return new ArrayList<>();
         }
+        Player admin = (Player) commandSender;
 
         if (strings.length == 1) {
             // First argument: list all subcommands
@@ -47,8 +48,7 @@ public class LobbyManagerTab implements TabCompleter {
 
         if (strings.length > 1) {
             if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_create_group)) {
-                String[] name = {admin.getWorld().getName() + "_group"};
-                return List.of(name);
+                return java.util.Collections.singletonList(admin.getWorld().getName() + "_group");
 
             } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_change_lobby_spawn_rotation)) {
                 if (strings.length == 2) {
@@ -71,22 +71,22 @@ public class LobbyManagerTab implements TabCompleter {
 
             } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_set_period)) {
                 if (strings.length == 2) {
-                    return List.of("<MM-DD-HH-mm-ss>");
+                    return java.util.Collections.singletonList("<MM-DD-HH-mm-ss>");
                 } else if (strings.length == 3) {
-                    return List.of("<DD-HH-mm-ss>");
+                    return java.util.Collections.singletonList("<DD-HH-mm-ss>");
                 }
 
             } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_disabled_hunger)) {
                 if (strings.length == 2) {
-                    return List.of("true", "false");
+                    return Arrays.asList("true", "false");
                 }
             } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_disabled_damage)) {
                 if (strings.length == 2) {
-                    return List.of("true", "false");
+                    return Arrays.asList("true", "false");
                 }
             } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_cansel_player_interaction)) {
                 if (strings.length == 2) {
-                    return List.of("true", "false");
+                    return Arrays.asList("true", "false");
                 }
             } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_set_game_mod)) {
                 if (strings.length == 2) {
@@ -125,6 +125,6 @@ public class LobbyManagerTab implements TabCompleter {
             }
         }
 
-        return List.of();
+        return new ArrayList<>();
     }
 }

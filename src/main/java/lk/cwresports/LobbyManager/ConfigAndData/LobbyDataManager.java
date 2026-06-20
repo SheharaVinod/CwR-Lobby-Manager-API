@@ -77,7 +77,8 @@ public class LobbyDataManager {
                 lobbySection.set("cansel_interaction", lobby.isCanselInteraction());
 
                 // Save event lobby data
-                if (lobby instanceof EventLobbies event) {
+                if (lobby instanceof EventLobbies) {
+                    EventLobbies event = (EventLobbies) lobby;
                     lobbySection.set("event_lobby", true);
                     lobbySection.set("event_date", event.getEventDate());
                     lobbySection.set("expire_days", event.getExpireDays());
