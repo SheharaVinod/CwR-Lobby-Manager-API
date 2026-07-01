@@ -29,6 +29,7 @@ This plugin has a lot of features. You can sync the Minecraft world time with re
 | **📍 Multiple Spawn Points** | Define multiple spawn locations per lobby with intelligent rotation (circular, random, or default) |
 | **🎉 Timed Event Lobbies** | Schedule special event lobbies that activate/deactivate automatically (perfect for holidays, events) |
 | **🔄 Auto-Rotation System** | Automatically rotate active lobbies on minute/hour/day/week/month basis or keep manual control |
+| **🕐 Real-World Time Sync** | Sync in-game day/night cycle with real-world clock or set a custom day length — per-world |
 | **💾 Flexible Storage** | Choose between MySQL (recommended for networks) or YAML files for data persistence |
 | **🔐 Permission-Based Access** | Fine-grained permission system for admins, default players, and premium user groups |
 | **⏰ Smart Spawn Cooldown** | Configurable AFK timer with movement cancellation to prevent teleport abuse |
@@ -150,6 +151,25 @@ Toggle admin mode (required for most configuration commands).
 /lobby-manager disabled_damage <true|false>          # Toggle damage
 /lobby-manager set_game_mod <GAMEMODE>               # Set lobby gamemode
 /lobby-manager cansel_player_interaction <true|false>  # Block interactions
+```
+
+**🕐 Time Settings** (requires `do_day_night_circle` to be enabled first via flags)
+```
+/lobby-manager time set_time_zone <offset|zone>
+  # Set timezone for real-world sync
+  # Offsets: 5_30, -5_00, 0_00
+  # IANA zones: Asia/Colombo, America/New_York
+
+/lobby-manager time real_world_sync <true|false>
+  # Sync in-game time to wall clock
+  # Requires a timezone to be set first
+
+/lobby-manager time set_length <duration>
+  # Set custom day/night cycle length
+  # Examples: 20m, 1h, 2h 30m 30s, 100h
+
+/lobby-manager time reset_to_default
+  # Reset time settings to default Minecraft 20-minute cycle
 ```
 
 **ℹ️ Information Commands**
