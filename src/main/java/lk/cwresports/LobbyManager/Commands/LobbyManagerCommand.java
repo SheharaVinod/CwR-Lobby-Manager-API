@@ -32,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,6 +55,7 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_entity_explosion = "entity_explosion";
     public static final String sub_block_explosion = "block_explosion";
     public static final String sub_flags = "flags";
+    public static final String sub_time = "time";
 
     public static final String sub_add_a_new_spawn = "add_a_new_spawn";
     public static final String sub_set_default_spawn = "set_default_spawn";
@@ -105,6 +107,7 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_entity_explosion,
             sub_block_explosion,
             sub_flags,
+            sub_time,
             sub_info
     };
 
@@ -206,6 +209,8 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return entity_explosion(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_block_explosion)) {
                 return block_explosion(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_time)) {
+                return time(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_info)) {
                 return info(admin, strings);
             }
@@ -948,6 +953,176 @@ public class LobbyManagerCommand implements CommandExecutor {
         } catch (Exception e) {
             return false;
         }
+        return true;
+    }
+
+    public boolean time(Player admin, String[] strings) {
+        if (strings.length < 2) {
+            printTimeUsage(admin);
+            return true;
+        }
+
+        if (!LobbyManager.getInstance().isInALobby(admin)) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+
+        String worldName = admin.getWorld().getName();
+        Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+        if (lobby == null) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+
+        String timeSub = strings[1].toLowerCase();
+        if (timeSub.equals("set_time_zone")) {
+            return timeSetTimeZone(admin, strings, lobby);
+        } else if (timeSub.equals("real_world_sync")) {
+            return timeRealWorldSync(admin, strings, lobby);
+        } else if (timeSub.equals("set_length")) {
+            return timeSetLength(admin, strings, lobby);
+        } else if (timeSub.equals("reset_to_default")) {
+            return timeResetToDefault(admin, strings, lobby);
+        } else {
+            printTimeUsage(admin);
+        }
+        return true;
+    }
+
+    private void printTimeUsage(Player admin) {
+        admin.sendMessage(TextStrings.colorize("§6§l=== Time Commands ==="));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager time set_time_zone <offset|zone>"));
+        admin.sendMessage(TextStrings.colorize("§e  Offsets: 5_30, 5_00, -5_00, 0_00"));
+        admin.sendMessage(TextStrings.colorize("§e  IANA zones: Asia/Colombo, America/New_York"));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager time real_world_sync <true|false>"));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager time set_length <duration>"));
+        admin.sendMessage(TextStrings.colorize("§e  Examples: 20m, 1h, 2h 30m 30s, 100h"));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager time reset_to_default"));
+        admin.sendMessage(TextStrings.colorize("§6§l=========================="));
+    }
+
+    private boolean timeSetTimeZone(Player admin, String[] strings, Lobby lobby) {
+        if (strings.length < 3) {
+            admin.sendMessage(TextStrings.colorize("§cUsage: /lobby-manager time set_time_zone <offset|zone>"));
+            admin.sendMessage(TextStrings.colorize("§eExamples: 5_30, +5_30, -5_00, Asia/Colombo"));
+            return true;
+        }
+
+        String raw = strings[2].trim();
+        String zoneId;
+
+        // Check if it's a UTC offset format (e.g., 5_30, -5_00, +5_30)
+        if (raw.matches("[+-]?\\d+_\\d+")) {
+            // Normalize: 5_30 -> +05:30, -5_00 -> -05:00
+            String normalized = raw.replace("_", "");
+            boolean negative = normalized.startsWith("-");
+            if (normalized.startsWith("+") || normalized.startsWith("-")) {
+                normalized = normalized.substring(1);
+            }
+            int totalMinutes = Integer.parseInt(normalized);
+            int hours = totalMinutes / 100;
+            int minutes = totalMinutes % 100;
+            if (minutes >= 60) {
+                admin.sendMessage(TextStrings.colorize("§cInvalid offset: minutes must be 0-59"));
+                return true;
+            }
+            String sign = negative ? "-" : "+";
+            zoneId = sign + String.format("%02d:%02d", hours, minutes);
+        } else {
+            zoneId = raw;
+        }
+
+        try {
+            ZoneId.of(zoneId);
+        } catch (Exception e) {
+            admin.sendMessage(TextStrings.colorize("§cInvalid time zone: " + raw));
+            return true;
+        }
+
+        lobby.setTimeZoneId(zoneId);
+        admin.sendMessage(TextStrings.colorize("§aTime zone set to " + zoneId));
+        return true;
+    }
+
+    private boolean timeRealWorldSync(Player admin, String[] strings, Lobby lobby) {
+        if (strings.length < 3) {
+            admin.sendMessage(TextStrings.colorize("§cUsage: /lobby-manager time real_world_sync <true|false>"));
+            return true;
+        }
+
+        boolean value = Boolean.parseBoolean(strings[2]);
+        if (value && lobby.getTimeZoneId() == null) {
+            admin.sendMessage(TextStrings.colorize("§cSet a time zone first using /lobby-manager time set_time_zone"));
+            return true;
+        }
+
+        lobby.setRealWorldSync(value);
+        if (value) {
+            lobby.getWorld().setGameRuleValue("doDaylightCycle", "false");
+            admin.sendMessage(TextStrings.colorize("§aReal world sync enabled. In-game time will match " + lobby.getTimeZoneId()));
+        } else {
+            if (lobby.getCustomCycleLengthMs() > 0) {
+                lobby.getWorld().setGameRuleValue("doDaylightCycle", "false");
+                lobby.setCustomCycleLengthMs(lobby.getCustomCycleLengthMs());
+            } else {
+                lobby.getWorld().setGameRuleValue("doDaylightCycle", "true");
+            }
+            admin.sendMessage(TextStrings.colorize("§aReal world sync disabled."));
+        }
+        return true;
+    }
+
+    private boolean timeSetLength(Player admin, String[] strings, Lobby lobby) {
+        if (strings.length < 3) {
+            admin.sendMessage(TextStrings.colorize("§cUsage: /lobby-manager time set_length <duration>"));
+            admin.sendMessage(TextStrings.colorize("§eExamples: 20m, 1h, 2h 30m 30s, 100h"));
+            return true;
+        }
+
+        long totalMs = 0;
+        for (int i = 2; i < strings.length; i++) {
+            String token = strings[i];
+            try {
+                if (token.endsWith("h")) {
+                    totalMs += Long.parseLong(token.substring(0, token.length() - 1)) * 3600000L;
+                } else if (token.endsWith("m")) {
+                    totalMs += Long.parseLong(token.substring(0, token.length() - 1)) * 60000L;
+                } else if (token.endsWith("s")) {
+                    totalMs += Long.parseLong(token.substring(0, token.length() - 1)) * 1000L;
+                } else {
+                    admin.sendMessage(TextStrings.colorize("§cInvalid token: " + token + ". Use format like 2h, 30m, 30s"));
+                    return true;
+                }
+            } catch (NumberFormatException e) {
+                admin.sendMessage(TextStrings.colorize("§cInvalid number in: " + token));
+                return true;
+            }
+        }
+
+        if (totalMs < 60000) {
+            admin.sendMessage(TextStrings.colorize("§cMinimum cycle length is 1 minute (60,000ms)."));
+            return true;
+        }
+
+        lobby.setRealWorldSync(false);
+        lobby.setCustomCycleLengthMs(totalMs);
+        lobby.getWorld().setGameRuleValue("doDaylightCycle", "false");
+
+        long hours = totalMs / 3600000;
+        long mins = (totalMs % 3600000) / 60000;
+        long secs = (totalMs % 60000) / 1000;
+        StringBuilder pretty = new StringBuilder();
+        if (hours > 0) pretty.append(hours).append("h ");
+        if (mins > 0) pretty.append(mins).append("m ");
+        if (secs > 0) pretty.append(secs).append("s ");
+        if (pretty.length() == 0) pretty.append("0s ");
+        admin.sendMessage(TextStrings.colorize("§aDay/night cycle length set to " + pretty.toString().trim()));
+        return true;
+    }
+
+    private boolean timeResetToDefault(Player admin, String[] strings, Lobby lobby) {
+        lobby.resetTimeSettings();
+        admin.sendMessage(TextStrings.colorize("§aTime settings reset to default Minecraft behavior."));
         return true;
     }
 }
