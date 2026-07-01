@@ -1,6 +1,6 @@
 name: CwRLobbyManagerAPI
 main: lk.cwresports.LobbyManager.CwRLobbyAPI
-version: 1.0.0
+version: ${project.version}
 author: Mr_Unknown
 website: cwresports.lk
 description: Lobby manager api for manage CwR hubs and mini-game lobbies.
