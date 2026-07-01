@@ -69,7 +69,13 @@ public class LobbyManager {
                     );
                 }
             }
-        }, 0L, 20L * 30); // Check every 30 seconds
+            // Time scheduler: tick custom time for lobbies every second
+            for (Lobby lobby : lobbyNameMap.values()) {
+                if (lobby.isCustomTimeActive()) {
+                    lobby.getWorld().setTime(lobby.calculateTargetTime());
+                }
+            }
+        }, 0L, 20L); // Every 1 second
     }
 
     public void stopRotationScheduler() {
