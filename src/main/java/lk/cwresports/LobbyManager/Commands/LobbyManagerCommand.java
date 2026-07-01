@@ -53,6 +53,7 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_do_day_night_circle = "do_day_night_circle";
     public static final String sub_entity_explosion = "entity_explosion";
     public static final String sub_block_explosion = "block_explosion";
+    public static final String sub_flags = "flags";
 
     public static final String sub_add_a_new_spawn = "add_a_new_spawn";
     public static final String sub_set_default_spawn = "set_default_spawn";
@@ -103,6 +104,7 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_do_day_night_circle,
             sub_entity_explosion,
             sub_block_explosion,
+            sub_flags,
             sub_info
     };
 
@@ -186,6 +188,8 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return info_of_all_groups(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_info_of_all_event_lobbies)) {
                 return info_of_all_event_lobbies(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_flags)) {
+                return flags(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_disabled_hunger)) {
                 return disabled_hunger(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_disabled_damage)) {
@@ -299,7 +303,7 @@ public class LobbyManagerCommand implements CommandExecutor {
             return true;
         }
         try {
-            boolean value = Boolean.parseBoolean(strings[0]);
+            boolean value = Boolean.parseBoolean(strings[1]);
             if (!LobbyManager.getInstance().isInALobby(admin)) {
                 admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
                 return true;
@@ -324,7 +328,7 @@ public class LobbyManagerCommand implements CommandExecutor {
             return true;
         }
         try {
-            boolean value = Boolean.parseBoolean(strings[0]);
+            boolean value = Boolean.parseBoolean(strings[1]);
             if (!LobbyManager.getInstance().isInALobby(admin)) {
                 admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
                 return true;
@@ -372,7 +376,7 @@ public class LobbyManagerCommand implements CommandExecutor {
             return true;
         }
         try {
-            boolean value = Boolean.parseBoolean(strings[0]);
+            boolean value = Boolean.parseBoolean(strings[1]);
             if (!LobbyManager.getInstance().isInALobby(admin)) {
                 admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
                 return true;
@@ -468,6 +472,53 @@ public class LobbyManagerCommand implements CommandExecutor {
             admin.sendMessage(TextStrings.colorize("Block explosions set to " + value));
         } catch (Exception e) {
             admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+        }
+        return true;
+    }
+
+    private void printFlagsUsage(Player admin) {
+        admin.sendMessage(TextStrings.colorize("§6§l=== Lobby Flags ==="));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager flags disabled_hunger <true|false>"));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager flags disabled_damage <true|false>"));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager flags set_game_mod <GAMEMODE>"));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager flags cansel_player_interaction <true|false>"));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager flags do_natural_mob_spawning <true|false>"));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager flags do_day_night_circle <true|false>"));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager flags entity_explosion <true|false>"));
+        admin.sendMessage(TextStrings.colorize("§6/lobby-manager flags block_explosion <true|false>"));
+        admin.sendMessage(TextStrings.colorize("§6§l=========================="));
+    }
+
+    public boolean flags(Player admin, String[] strings) {
+        if (strings.length < 2) {
+            printFlagsUsage(admin);
+            return true;
+        }
+
+        String flagName = strings[1];
+        String[] shiftedArgs = new String[strings.length - 1];
+        shiftedArgs[0] = flagName;
+        System.arraycopy(strings, 2, shiftedArgs, 1, strings.length - 2);
+
+        if (flagName.equalsIgnoreCase(sub_disabled_hunger)) {
+            return disabled_hunger(admin, shiftedArgs);
+        } else if (flagName.equalsIgnoreCase(sub_disabled_damage)) {
+            return disabled_damage(admin, shiftedArgs);
+        } else if (flagName.equalsIgnoreCase(sub_set_game_mod)) {
+            return set_game_mod(admin, shiftedArgs);
+        } else if (flagName.equalsIgnoreCase(sub_cansel_player_interaction)) {
+            return cansel_player_interaction(admin, shiftedArgs);
+        } else if (flagName.equalsIgnoreCase(sub_do_natural_mob_spawning)) {
+            return do_natural_mob_spawning(admin, shiftedArgs);
+        } else if (flagName.equalsIgnoreCase(sub_do_day_night_circle)) {
+            return do_day_night_circle(admin, shiftedArgs);
+        } else if (flagName.equalsIgnoreCase(sub_entity_explosion)) {
+            return entity_explosion(admin, shiftedArgs);
+        } else if (flagName.equalsIgnoreCase(sub_block_explosion)) {
+            return block_explosion(admin, shiftedArgs);
+        } else {
+            admin.sendMessage(TextStrings.colorize("§cUnknown flag: " + flagName));
+            printFlagsUsage(admin);
         }
         return true;
     }
