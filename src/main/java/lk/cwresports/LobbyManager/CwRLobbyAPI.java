@@ -24,7 +24,13 @@ import lk.cwresports.LobbyManager.Commands.LobbyManagerCommand;
 import lk.cwresports.LobbyManager.Commands.SelectSpawnCommand;
 import lk.cwresports.LobbyManager.Commands.SpawnCommand;
 import lk.cwresports.LobbyManager.ConfigAndData.PlayerDataManager;
-import lk.cwresports.LobbyManager.Events.*;
+import lk.cwresports.LobbyManager.Events.ExplosionListener;
+import lk.cwresports.LobbyManager.Events.PlayerFallToVoidListener;
+import lk.cwresports.LobbyManager.Events.PlayerHungryListener;
+import lk.cwresports.LobbyManager.Events.PlayerJoinToServer;
+import lk.cwresports.LobbyManager.Events.PlayerLeaveListener;
+import lk.cwresports.LobbyManager.Events.PlayerTakeDamage;
+import lk.cwresports.LobbyManager.Events.WhenPlayerInteractLobbyBlocks;
 import lk.cwresports.LobbyManager.Tabs.LobbyManagerTab;
 import lk.cwresports.LobbyManager.Tabs.SelectSpawnTab;
 import lk.cwresports.LobbyManager.Utils.RotationCalculator;
@@ -79,6 +85,7 @@ public class CwRLobbyAPI extends JavaPlugin {
         PlayerHungryListener.register(this);
         PlayerTakeDamage.register(this);
         WhenPlayerInteractLobbyBlocks.register(this);
+        ExplosionListener.register(this);
     }
 
     @Override

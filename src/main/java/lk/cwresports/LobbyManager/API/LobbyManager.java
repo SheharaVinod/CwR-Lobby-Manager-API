@@ -86,6 +86,10 @@ public class LobbyManager {
         return this.lobbyWorlds.contains(player.getWorld());
     }
 
+    public boolean isInALobby(World world) {
+        return this.lobbyWorlds.contains(world);
+    }
+
     public void registerNameFor(Lobby lobby) {
         String name = lobby.getWorld().getName();
         lobbyNameMap.put(name, lobby);

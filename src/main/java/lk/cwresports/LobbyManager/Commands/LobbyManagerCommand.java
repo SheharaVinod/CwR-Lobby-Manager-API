@@ -49,6 +49,10 @@ public class LobbyManagerCommand implements CommandExecutor {
     public static final String sub_disabled_damage = "disabled_damage";
     public static final String sub_set_game_mod = "set_game_mod";
     public static final String sub_cansel_player_interaction = "cansel_player_interaction";
+    public static final String sub_do_natural_mob_spawning = "do_natural_mob_spawning";
+    public static final String sub_do_day_night_circle = "do_day_night_circle";
+    public static final String sub_entity_explosion = "entity_explosion";
+    public static final String sub_block_explosion = "block_explosion";
 
     public static final String sub_add_a_new_spawn = "add_a_new_spawn";
     public static final String sub_set_default_spawn = "set_default_spawn";
@@ -95,6 +99,10 @@ public class LobbyManagerCommand implements CommandExecutor {
             sub_disabled_damage,
             sub_set_game_mod,
             sub_cansel_player_interaction,
+            sub_do_natural_mob_spawning,
+            sub_do_day_night_circle,
+            sub_entity_explosion,
+            sub_block_explosion,
             sub_info
     };
 
@@ -186,6 +194,14 @@ public class LobbyManagerCommand implements CommandExecutor {
                 return set_game_mod(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_cansel_player_interaction)) {
                 return cansel_player_interaction(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_do_natural_mob_spawning)) {
+                return do_natural_mob_spawning(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_do_day_night_circle)) {
+                return do_day_night_circle(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_entity_explosion)) {
+                return entity_explosion(admin, strings);
+            } else if (strings[0].equalsIgnoreCase(sub_block_explosion)) {
+                return block_explosion(admin, strings);
             } else if (strings[0].equalsIgnoreCase(sub_info)) {
                 return info(admin, strings);
             }
@@ -224,6 +240,10 @@ public class LobbyManagerCommand implements CommandExecutor {
         admin.sendMessage(TextStrings.colorize("§eDisabled Hunger: §f" + lobby.isDisabledHunger()));
         admin.sendMessage(TextStrings.colorize("§eDisabled Damage: §f" + lobby.isDisabledDamage()));
         admin.sendMessage(TextStrings.colorize("§eCancel Player Interactions: §f" + lobby.isCanselInteraction()));
+        admin.sendMessage(TextStrings.colorize("§eNatural Mob Spawning: §f" + lobby.isDoNaturalMobSpawning()));
+        admin.sendMessage(TextStrings.colorize("§eDay/Night Cycle: §f" + lobby.isDoDayNightCircle()));
+        admin.sendMessage(TextStrings.colorize("§eEntity Explosions: §f" + lobby.isEntityExplosion()));
+        admin.sendMessage(TextStrings.colorize("§eBlock Explosions: §f" + lobby.isBlockExplosion()));
 
         // Location settings
         admin.sendMessage(TextStrings.colorize("§eSpawn Rotation Type: §f" + lobby.getLocationTypes().name()));
@@ -364,6 +384,90 @@ public class LobbyManagerCommand implements CommandExecutor {
         } catch (Exception e) {
             admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
             return true;
+        }
+        return true;
+    }
+
+    public boolean do_natural_mob_spawning(Player admin, String[] strings) {
+        if (strings.length < 2) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        try {
+            boolean value = Boolean.parseBoolean(strings[1]);
+            if (!LobbyManager.getInstance().isInALobby(admin)) {
+                admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+                return true;
+            }
+            String worldName = admin.getWorld().getName();
+            Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+            lobby.setDoNaturalMobSpawning(value);
+            admin.sendMessage(TextStrings.colorize("Natural mob spawning set to " + value));
+        } catch (Exception e) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+        }
+        return true;
+    }
+
+    public boolean do_day_night_circle(Player admin, String[] strings) {
+        if (strings.length < 2) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        try {
+            boolean value = Boolean.parseBoolean(strings[1]);
+            if (!LobbyManager.getInstance().isInALobby(admin)) {
+                admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+                return true;
+            }
+            String worldName = admin.getWorld().getName();
+            Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+            lobby.setDoDayNightCircle(value);
+            admin.sendMessage(TextStrings.colorize("Day/night cycle set to " + value));
+        } catch (Exception e) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+        }
+        return true;
+    }
+
+    public boolean entity_explosion(Player admin, String[] strings) {
+        if (strings.length < 2) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        try {
+            boolean value = Boolean.parseBoolean(strings[1]);
+            if (!LobbyManager.getInstance().isInALobby(admin)) {
+                admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+                return true;
+            }
+            String worldName = admin.getWorld().getName();
+            Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+            lobby.setEntityExplosion(value);
+            admin.sendMessage(TextStrings.colorize("Entity explosions set to " + value));
+        } catch (Exception e) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+        }
+        return true;
+    }
+
+    public boolean block_explosion(Player admin, String[] strings) {
+        if (strings.length < 2) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+            return true;
+        }
+        try {
+            boolean value = Boolean.parseBoolean(strings[1]);
+            if (!LobbyManager.getInstance().isInALobby(admin)) {
+                admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
+                return true;
+            }
+            String worldName = admin.getWorld().getName();
+            Lobby lobby = LobbyManager.getInstance().getLobbyByName(worldName);
+            lobby.setBlockExplosion(value);
+            admin.sendMessage(TextStrings.colorize("Block explosions set to " + value));
+        } catch (Exception e) {
+            admin.sendMessage(TextStrings.colorize(TextStrings.SOMETHING_WENT_WRONG));
         }
         return true;
     }

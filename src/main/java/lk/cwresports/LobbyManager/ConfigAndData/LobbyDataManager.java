@@ -75,6 +75,10 @@ public class LobbyDataManager {
                 lobbySection.set("disabled_damage", lobby.isDisabledDamage());
                 lobbySection.set("game_mode", lobby.getGameMode().name());
                 lobbySection.set("cansel_interaction", lobby.isCanselInteraction());
+                lobbySection.set("do_natural_mob_spawning", lobby.isDoNaturalMobSpawning());
+                lobbySection.set("do_day_night_circle", lobby.isDoDayNightCircle());
+                lobbySection.set("entity_explosion", lobby.isEntityExplosion());
+                lobbySection.set("block_explosion", lobby.isBlockExplosion());
 
                 // Save event lobby data
                 if (lobby instanceof EventLobbies) {
@@ -200,9 +204,14 @@ public class LobbyDataManager {
                     lobby.setGameMode(GameMode.ADVENTURE);
                 }
                 lobby.setCanselInteraction(lobbySection.getBoolean("cansel_interaction", false));
+                lobby.setDoNaturalMobSpawning(lobbySection.getBoolean("do_natural_mob_spawning", false));
+                lobby.setDoDayNightCircle(lobbySection.getBoolean("do_day_night_circle", false));
+                lobby.setEntityExplosion(lobbySection.getBoolean("entity_explosion", false));
+                lobby.setBlockExplosion(lobbySection.getBoolean("block_explosion", false));
 
                 loadedLobbies.put(lobbyName, lobby);
                 lobbyManager.registerNameFor(lobby);
+                lobby.applyWorldSettings();
             }
         }
 

@@ -46,6 +46,11 @@ public class Lobby {
 
     private GameMode gameMode = GameMode.ADVENTURE;
 
+    private boolean doNaturalMobSpawning = false;
+    private boolean doDayNightCircle = false;
+    private boolean entityExplosion = false;
+    private boolean blockExplosion = false;
+
     public Lobby(Location currentLocation) {
         this.world = currentLocation.getWorld();
         this.defaultSpawnLocation = currentLocation;
@@ -87,6 +92,53 @@ public class Lobby {
 
     public boolean isDisabledDamage() {
         return disabledDamage;
+    }
+
+    public boolean isDoNaturalMobSpawning() {
+        return doNaturalMobSpawning;
+    }
+
+    public void setDoNaturalMobSpawning(boolean doNaturalMobSpawning) {
+        this.doNaturalMobSpawning = doNaturalMobSpawning;
+        if (!doNaturalMobSpawning) {
+            world.setGameRuleValue("doMobSpawning", "false");
+        } else {
+            world.setGameRuleValue("doMobSpawning", "true");
+        }
+    }
+
+    public boolean isDoDayNightCircle() {
+        return doDayNightCircle;
+    }
+
+    public void setDoDayNightCircle(boolean doDayNightCircle) {
+        this.doDayNightCircle = doDayNightCircle;
+        if (!doDayNightCircle) {
+            world.setGameRuleValue("doDaylightCycle", "false");
+        } else {
+            world.setGameRuleValue("doDaylightCycle", "true");
+        }
+    }
+
+    public boolean isEntityExplosion() {
+        return entityExplosion;
+    }
+
+    public void setEntityExplosion(boolean entityExplosion) {
+        this.entityExplosion = entityExplosion;
+    }
+
+    public boolean isBlockExplosion() {
+        return blockExplosion;
+    }
+
+    public void setBlockExplosion(boolean blockExplosion) {
+        this.blockExplosion = blockExplosion;
+    }
+
+    public void applyWorldSettings() {
+        setDoNaturalMobSpawning(doNaturalMobSpawning);
+        setDoDayNightCircle(doDayNightCircle);
     }
 
     public void addSpawnLocation(Location location) {
