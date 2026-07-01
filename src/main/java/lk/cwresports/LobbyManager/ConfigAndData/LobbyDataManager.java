@@ -79,6 +79,9 @@ public class LobbyDataManager {
                 lobbySection.set("do_day_night_circle", lobby.isDoDayNightCircle());
                 lobbySection.set("entity_explosion", lobby.isEntityExplosion());
                 lobbySection.set("block_explosion", lobby.isBlockExplosion());
+                lobbySection.set("real_world_sync", lobby.isRealWorldSync());
+                lobbySection.set("time_zone", lobby.getTimeZoneId());
+                lobbySection.set("custom_cycle_length_ms", lobby.getCustomCycleLengthMs());
 
                 // Save event lobby data
                 if (lobby instanceof EventLobbies) {
@@ -208,6 +211,12 @@ public class LobbyDataManager {
                 lobby.setDoDayNightCircle(lobbySection.getBoolean("do_day_night_circle", false));
                 lobby.setEntityExplosion(lobbySection.getBoolean("entity_explosion", false));
                 lobby.setBlockExplosion(lobbySection.getBoolean("block_explosion", false));
+                lobby.setRealWorldSync(lobbySection.getBoolean("real_world_sync", false));
+                lobby.setTimeZoneId(lobbySection.getString("time_zone", null));
+                long cycleLength = lobbySection.getLong("custom_cycle_length_ms", -1);
+                if (cycleLength > 0) {
+                    lobby.setCustomCycleLengthMs(cycleLength);
+                }
 
                 loadedLobbies.put(lobbyName, lobby);
                 lobbyManager.registerNameFor(lobby);
