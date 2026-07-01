@@ -69,7 +69,6 @@ public class LobbyManager {
                     );
                 }
             }
-            // Time scheduler: tick custom time for lobbies every second
             for (Lobby lobby : lobbyNameMap.values()) {
                 if (lobby.isCustomTimeActive()) {
                     lobby.getWorld().setTime(lobby.calculateTargetTime());
