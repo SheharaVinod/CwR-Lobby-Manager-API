@@ -122,6 +122,18 @@ public class LobbyManagerTab implements TabCompleter {
                             TimeUnits.MANUAL.name()
                     ), strings[2], true);
                 }
+            } else if (strings[0].equalsIgnoreCase(LobbyManagerCommand.sub_time)) {
+                if (strings.length == 2) {
+                    return Arrays.asList("set_time_zone", "real_world_sync", "set_length", "reset_to_default");
+                } else if (strings.length == 3) {
+                    if (strings[1].equalsIgnoreCase("set_time_zone")) {
+                        return Arrays.asList("5_30", "5_00", "4_30", "0_00", "-5_00", "Asia/Colombo", "America/New_York", "Europe/London");
+                    } else if (strings[1].equalsIgnoreCase("real_world_sync")) {
+                        return Arrays.asList("true", "false");
+                    } else if (strings[1].equalsIgnoreCase("set_length")) {
+                        return Arrays.asList("20m", "1h", "30m", "2h 30m 30s");
+                    }
+                }
             }
         }
 
