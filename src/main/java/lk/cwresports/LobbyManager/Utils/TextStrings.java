@@ -98,6 +98,12 @@ public class TextStrings {
             "&6/lobby-manager admin &7- Toggle admin mode",
             "&6/lobby-manager save &7- Save all lobby data",
             "",
+            "&7Time Settings:",
+            "&6/lobby-manager time set_time_zone <offset|zone> &7- Set timezone for real-world sync",
+            "&6/lobby-manager time real_world_sync <true|false> &7- Sync in-game time to wall clock",
+            "&6/lobby-manager time set_length <duration> &7- Set custom day/night cycle length",
+            "&6/lobby-manager time reset_to_default &7- Reset time settings to default",
+            "",
             "&6&l================================="
     };
 				
