@@ -26,6 +26,8 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -50,6 +52,10 @@ public class Lobby {
     private boolean doDayNightCircle = false;
     private boolean entityExplosion = false;
     private boolean blockExplosion = false;
+    private boolean realWorldSync = false;
+    private String timeZoneId = null;
+    private long customCycleLengthMs = -1;
+    private long cycleReferenceTime = 0;
 
     public Lobby(Location currentLocation) {
         this.world = currentLocation.getWorld();
@@ -134,6 +140,63 @@ public class Lobby {
 
     public void setBlockExplosion(boolean blockExplosion) {
         this.blockExplosion = blockExplosion;
+    }
+
+    public boolean isRealWorldSync() {
+        return realWorldSync;
+    }
+
+    public void setRealWorldSync(boolean realWorldSync) {
+        this.realWorldSync = realWorldSync;
+    }
+
+    public String getTimeZoneId() {
+        return timeZoneId;
+    }
+
+    public void setTimeZoneId(String timeZoneId) {
+        this.timeZoneId = timeZoneId;
+    }
+
+    public long getCustomCycleLengthMs() {
+        return customCycleLengthMs;
+    }
+
+    public void setCustomCycleLengthMs(long customCycleLengthMs) {
+        this.customCycleLengthMs = customCycleLengthMs;
+        if (customCycleLengthMs > 0) {
+            this.cycleReferenceTime = System.currentTimeMillis();
+        }
+    }
+
+    public boolean isCustomTimeActive() {
+        return realWorldSync || customCycleLengthMs > 0;
+    }
+
+    public void resetTimeSettings() {
+        this.realWorldSync = false;
+        this.timeZoneId = null;
+        this.customCycleLengthMs = -1;
+        this.cycleReferenceTime = 0;
+        world.setGameRuleValue("doDaylightCycle", "true");
+    }
+
+    public long calculateTargetTime() {
+        if (realWorldSync && timeZoneId != null) {
+            try {
+                ZoneId zone = ZoneId.of(timeZoneId);
+                ZonedDateTime now = ZonedDateTime.now(zone);
+                int secondsSinceMidnight = now.getHour() * 3600 + now.getMinute() * 60 + now.getSecond();
+                int offsetSeconds = (secondsSinceMidnight - 21600 + 86400) % 86400;
+                return (offsetSeconds * 24000L / 86400) % 24000;
+            } catch (Exception e) {
+                return world.getTime();
+            }
+        } else if (customCycleLengthMs > 0) {
+            long elapsed = (System.currentTimeMillis() - cycleReferenceTime) % customCycleLengthMs;
+            return (elapsed * 24000L / customCycleLengthMs) % 24000;
+        }
+        return world.getTime();
     }
 
     public void applyWorldSettings() {
