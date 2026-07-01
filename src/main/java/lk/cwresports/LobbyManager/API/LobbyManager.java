@@ -54,6 +54,7 @@ public class LobbyManager {
 
 
     public void startRotationScheduler() {
+        // Group rotation checker (every 30 seconds)
         rotationTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             long now = System.currentTimeMillis();
             for (LobbyGroup group : lobbyGroupMap.values()) {
@@ -69,12 +70,16 @@ public class LobbyManager {
                     );
                 }
             }
+        }, 0L, 20L * 30);
+
+        // Time scheduler (every 1 second)
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             for (Lobby lobby : lobbyNameMap.values()) {
                 if (lobby.isCustomTimeActive()) {
                     lobby.getWorld().setTime(lobby.calculateTargetTime());
                 }
             }
-        }, 0L, 20L); // Every 1 second
+        }, 0L, 20L);
     }
 
     public void stopRotationScheduler() {

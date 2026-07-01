@@ -254,21 +254,20 @@ public class LobbyManagerCommand implements CommandExecutor {
         admin.sendMessage(TextStrings.colorize("§eEntity Explosions: §f" + lobby.isEntityExplosion()));
         admin.sendMessage(TextStrings.colorize("§eBlock Explosions: §f" + lobby.isBlockExplosion()));
 
-        admin.sendMessage(TextStrings.colorize("§eCustom Time Active: §f" + lobby.isCustomTimeActive()));
-        if (lobby.isCustomTimeActive()) {
-            if (lobby.isRealWorldSync()) {
-                admin.sendMessage(TextStrings.colorize("§e  Sync Mode: §fReal World (" + lobby.getTimeZoneId() + ")"));
-            } else if (lobby.getCustomCycleLengthMs() > 0) {
-                long ms = lobby.getCustomCycleLengthMs();
-                long h = ms / 3600000;
-                long m = (ms % 3600000) / 60000;
-                long s = (ms % 60000) / 1000;
-                StringBuilder len = new StringBuilder();
-                if (h > 0) len.append(h).append("h ");
-                if (m > 0) len.append(m).append("m ");
-                if (s > 0) len.append(s).append("s ");
-                admin.sendMessage(TextStrings.colorize("§e  Cycle Length: §f" + len.toString().trim()));
-            }
+        if (lobby.isRealWorldSync()) {
+            admin.sendMessage(TextStrings.colorize("§eTime Real World Sync: §fenabled (" + lobby.getTimeZoneId() + ")"));
+        } else if (lobby.getCustomCycleLengthMs() > 0) {
+            long ms = lobby.getCustomCycleLengthMs();
+            long h = ms / 3600000;
+            long m = (ms % 3600000) / 60000;
+            long s = (ms % 60000) / 1000;
+            StringBuilder len = new StringBuilder();
+            if (h > 0) len.append(h).append("h ");
+            if (m > 0) len.append(m).append("m ");
+            if (s > 0) len.append(s).append("s ");
+            admin.sendMessage(TextStrings.colorize("§eTime Custom Cycle: §f" + len.toString().trim()));
+        } else {
+            admin.sendMessage(TextStrings.colorize("§eTime Settings: §fDefault (20 min cycle)"));
         }
 
         // Location settings
@@ -1078,7 +1077,6 @@ public class LobbyManagerCommand implements CommandExecutor {
         } else {
             if (lobby.getCustomCycleLengthMs() > 0) {
                 lobby.getWorld().setGameRuleValue("doDaylightCycle", "false");
-                lobby.setCustomCycleLengthMs(lobby.getCustomCycleLengthMs());
             } else {
                 lobby.getWorld().setGameRuleValue("doDaylightCycle", "true");
             }

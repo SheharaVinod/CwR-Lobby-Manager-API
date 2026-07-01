@@ -119,6 +119,7 @@ public class Lobby {
 
     public void setDoDayNightCircle(boolean doDayNightCircle) {
         this.doDayNightCircle = doDayNightCircle;
+        if (isCustomTimeActive()) return;
         if (!doDayNightCircle) {
             world.setGameRuleValue("doDaylightCycle", "false");
         } else {
@@ -201,7 +202,9 @@ public class Lobby {
 
     public void applyWorldSettings() {
         setDoNaturalMobSpawning(doNaturalMobSpawning);
-        setDoDayNightCircle(doDayNightCircle);
+        if (!isCustomTimeActive()) {
+            setDoDayNightCircle(doDayNightCircle);
+        }
     }
 
     public void addSpawnLocation(Location location) {
