@@ -1011,9 +1011,7 @@ public class LobbyManagerCommand implements CommandExecutor {
         String raw = strings[2].trim();
         String zoneId;
 
-        // Check if it's a UTC offset format (e.g., 5_30, -5_00, +5_30)
         if (raw.matches("[+-]?\\d+_\\d+")) {
-            // Normalize: 5_30 -> +05:30, -5_00 -> -05:00
             String normalized = raw.replace("_", "");
             boolean negative = normalized.startsWith("-");
             if (normalized.startsWith("+") || normalized.startsWith("-")) {
