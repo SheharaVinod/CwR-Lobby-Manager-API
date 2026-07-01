@@ -9,6 +9,18 @@
 
 ---
 
+## 🤔 Why?
+
+Have you ever had to manually change lobbies month after month? This plugin allows you to automate things like this. A lobby manager is needed when creating a minigame or building a main hub setup for a network, allowing you to have multiple lobbies pre-configured. That way, when the scheduled time arrives, the lobby switches automatically. Additionally, through this plugin, you can set up not just a single spawn point for a lobby, but multiple spawn points.
+
+Furthermore, imagine you want to set up a special lobby for your customers, donators, or VIP players; you can display one distinct lobby for those VIP players and a completely separate lobby for the default players.
+
+Actually, even though we call it a lobby, you can create lobby groups. This means VIP players fall under one separate group, and default players under another. The default players' lobby set will automatically switch for occasions like Christmas, and the lobbies within the VIP group will also switch automatically to match them.
+
+This plugin has a lot of features. You can sync the Minecraft world time with real-world time to give your players a great experience. If you are building something like a hub setup, this plugin is an excellent and convenient choice. Similarly, if you are developing a minigame and want to utilize these features for the hub management of that minigame server setup, this plugin will be incredibly helpful to you. Check the wiki page to see how to set it up.
+
+---
+
 ## ✨ Key Features
 
 | Feature | Description |
